@@ -1,0 +1,276 @@
+\documentclass[11pt]{article} 
+
+% ------- List of packages to import ------------
+\usepackage{fullpage}
+\usepackage{soul}
+\usepackage{url}
+\usepackage{pgf}
+\usepackage{tikz}
+\usepackage{enumitem}
+\usetikzlibrary{arrows,automata}
+\usepackage[latin1]{inputenc}
+\usepackage{clrscode3e} % Documentation here http://www.cs.dartmouth.edu/~thc/clrscode/clrscode3e.pdf
+\usepackage{amssymb}
+\usepackage{amsmath}
+\RequirePackage[amsmath,hyperref,thmmarks]{ntheorem}
+\usepackage{hyperref} % This always has to be the LAST package.  
+
+\theoremseparator{.}
+
+% ------- Theorem and related environments --------
+\newtheorem{theorem}{Theorem}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition} 
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem{observation}[theorem]{Observation}
+\newtheorem{fact}[theorem]{Fact}
+
+% ------- Commands specifying theorem style -------
+
+\theoremstyle{nonumberplain}
+\theoremheaderfont{\normalfont\itshape}
+\theorembodyfont{\normalfont}
+\theoremsymbol{\ensuremath{_\blacksquare}}
+\newtheorem{proof}{Proof}
+
+% ------- Useful math macros -----------
+\newcommand{\NN}{\mathcal{N}} % Natural Numbers
+\newcommand{\RR}{\mathcal{R}} % Real Numbers
+\newcommand{\ZZ}{\mathcal{Z}} % Integers
+\newcommand{\QQ}{\mathcal{Q}} % Rational Numbers
+
+\newcommand{\set}[1]{\ensuremath{\{{#1}\}}} % Set
+\newcommand{\bigset}[1]{\ensuremath{\left\{{#1}\right\}}}
+\newcommand{\condset}[2]{\ensuremath{\set{{#1}\;|\;{#2}}}} % Conditional set
+\newcommand{\nin}{\not\in}
+\newcommand{\cross}{\times} % Cartesian product
+\newcommand{\ssn}{\subsetneq} % Proper subset
+\newcommand{\sse}{\subseteq} % Subset
+
+
+
+
+\begin{document}
+
+%% ^^^^^^^^^ Don't change anything above this line ^^^^^^^^^^^^^^^^
+
+
+
+\begin{center}
+
+{\LARGE
+\textsc{CSC 250 -- Algorithms -- Problem Set 6}
+\bigskip}
+
+\bigskip
+
+\end{center}
+
+\section*{Problem}
+
+% Set latex formatting scores to correspond to problem statement.
+\hyphenpenalty=10000
+\hbadness=10000
+\tolerance=10000
+
+% You may have noticed that \LaTeX{} uses full justification to format
+% its text.  In particular, each line of a paragraph, aside from the
+% last, fully spans the page with all words close to evenly spaced.
+% Below is an example of some awkwardness that can occur when fully
+% justifying paragraphs.
+
+% \noindent a a a a a a aa  b b b b b bb b b b bbb bbb b b cccccccccccccccccccccccccccccccccc ddddddddddddddddddddddddd  ee e ee e e ee ffffffffffffffffffffffffff ggggggggggggggggggggggggggggggggggggggggggggggggggggggggg hhhhhhhhhhhh iiiiiiiiiiiiiiiii jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj kkkkkkkkkkkkkkk l m n o p q r s t u v w x y z.
+
+% Although the example above suggests otherwise, we will assume that the
+% font is fixed width, that is, every character (including the space
+% character) has the same width.  We will also assume that words cannot
+% be hyphenated -- normally, \LaTeX{} would hyphenate words, but I've
+% disabled it in this document.
+
+% Each \LaTeX{} paragraph has a target line width $w$, measured in
+% characters, set either by default or by the author.  \LaTeX{} uses a
+% scoring system to judge how good the formatting of a fully justified
+% paragraph is.  The score of a paragraph is related to the amount of
+% white space between words.  If the number of spaces between two
+% adjacent words on the same line is $g$ the score of that gap is
+% $(g-1)^2$.  Observe that gaps of one space have score 0.  The total
+% score of a paragraph is the sum of (i) the scores for each gap between
+% adjacent words on all lines, (ii) 10000 for each line except the last
+% with only one word on it, and (iii) 100000 for each line exceeding the
+% target line width. Below are two examples of formattings (a quote by
+% Richard Hamming) and their scores.  In both examples the target width
+% is 21 and indicated by the hashs in the first line.
+% \begin{verbatim}
+% #####################
+% The    purpose     of 
+% computation        
+% is    insight,    not 
+% numbers.
+% \end{verbatim}
+% Score is $((4-1)^2 + (5-1)^2) + 10000 + ((4-1)^2 + (4-1)^2) + 0 = 10043.$ 
+% \begin{verbatim}
+% #####################
+% The           purpose 
+% of   computation   is 
+% insight, not numbers.
+% \end{verbatim}
+% Score is $(11-1)^2 + ((3-1)^2 + (3-1)^2) + ((1-1)^2 + (1-1)^2) = 108.$ The formatting of
+% the second example is therefore considered superior to the first.
+
+% \pagebreak
+
+% \noindent With these definitions and examples in mind we define the text
+% justification problem.
+
+% \begin{itemize}
+% \item[] \textbf{Input:} A list of $n$ strings, $s_1, s_2, \ldots,
+%   s_n$.  A target paragraph width $w$.
+% \item[] \textbf{Output:} The minimum score $r$ of any paragraph
+%   formatting of the strings $s_1, \ldots, s_n$.
+% \end{itemize}
+
+% \noindent Develop and analyze an efficient dynamic programming
+% algorithm for the text justification problem.  In particular your
+% solution should include:
+\begin{enumerate}
+\item \textbf{Description.} %An informal, intuitive description of your
+%   dynamic programming algorithm written in English.  This description
+%   should indicate the choice(s) your algorithm is making, and the
+%   subproblems it considers.\\
+  We apply a bottom-up, dynamic programming approach to identify the optimal solution to the text justification problem. Specifically, $\proc{Text-Justification}$ outputs the minimum score $r$ for any paragraph formatting of the strings $S[1..n]$ with a line width of $w$. %We first get the number of strings in the sequence, $n$, and %if $n==0$ return $0$ since the sequence of strings is empty.
+  %Otherwise, 
+  We create the arrays $L$, $M$, and the table $E$ where $L$ stores the length of each string in the sequence $S$, $M$ stores the total minimum score (optimal solution) for all subproblems by sequence length $S[1..i]$ such that $1 \le i \le n$, and $E$ stores the number of extra spaces in a given line containing the strings $S[i..j]$. %for all combinations of $i$ and $j$ such that $i \le j$ (lines 8-11). 
+%   This is accomplished by subtracting the number of characters in the given strings from $w$ and subtracting an additional 1 for spaces between words where necessary.\\
+  With $L$ and $E$ filled with the necessary values, we begin computing the minimum score $r$ for all possible line combinations for the given subproblems. Given the number of extra spaces, the range of the subproblem, and length of the sequence $s$, the score of each subproblem is computed in the helper procedure, $\proc{Get-Score}$, based on criteria (i), (ii), and (iii) from the problem description. Specifically, that a single word line, longer than the maximum width, that is not on the last line is 110000, otherwise, a line longer than $w$ has the score 100000, if the last line contains one word the score is 0, and if a line contains a single word and is not the last line is scored 10000. All remaining cases are computed in the following way. We take the total number of spaces and distribute them as evenly as possible across the number of gaps on the line, square the number of \emph{extra} spaces for each gap then add up the scores of all gaps to get the total score for that subproblem.\\ 
+  We first set $M[0]=0$ since the initial minimum score, prior to adding any of the strings, is $0$. Then we set $M[i]= \infty$ to ensure that one of the subproblem scores computed on each iteration of $i$ will be taken as the minimum score. We then iterate from $j=1..i$ to $i$ for all possible $i=1,2,...,n$ and compute the score $r$ for each possible line combination from the subproblems of $S[j..i]$. Since we use a bottom-up approach, the first score computed for $i=j=1$ is $S[j..i]=S[1..1]=S[1]$, the score of which will always be saved in $M[1]$ because $M[0]=0$ plus the score computed for $S[1]$ is always less than $\infty$. On the second iteration when $i=2$ we compute the values for the subproblems $S[1..2]$ and $S[2..2]$ and so on through $i=n$ for each value of $i$. After we compute the scores of all possible subproblems from a given $S[1..i]$, keeping only the minimum value of these subproblems, we make our choice: Should we add $S[i]$ to the current line containing our minimum value $S[j..(i-1)]$ where $1 \le j \le (i-1)$ (this is the case because the current minimum score could be the result of a single line $S[1..(i-1)]$ or the combined score of of multiple lines $(S[1..k])+(S[(k+1)..(i-1))$, where $1 \le k<(i-1)$), this choice would create a new optimal solution from $S[j..i]$, or should we create a new line break in in the current optimal solution putting $S[i]$ on a new line. In this case, we now have an optimal solution generated from a previously computed minimum line score with the score of the current subproblem, which goes on a new line. \\
+  Once our choice is made, the new minimum score is stored, to be compared with scores produced in subsequent iterations. Thus, when every subproblem has been computed once and compared with the previous minimum scores, we can immediately return the minimum score $r$ which is the optimal solution to the original problem.
+  \pagebreak
+\item \textbf{Algorithm.} %A formal statement of your algorithm written
+%   using the codebox environment.\\
+\begin{codebox}
+\Procname{$\proc{Text-Justification}(S,w)$}
+\li $n=S.length$
+\li \If $n==0$ \Do
+\li     \Return $0$
+    \End
+% \li $lineMax=0$  \phantom{llll}\textbf{//}Stores cost of words with size greater than $w$
+\li create arrays $L[1..n]$ and $M[0..n]$, and table $E[0..n,0..n]$
+\li set all entries of $L$, $M$ and $E$ to $0$
+\li \For $i=1$ \To $n$ \Do
+\li     $L[i]=S[i].length$
+    \End
+\li \For $i=1$ \To $n$ \Do
+\li     $E[i,i]=w-L[i]$
+\li     \For $j=i+1$ \To $n$ \Do
+\li         $E[i,j]=E[i,j-1]-L[j]-1$
+        \End
+    \End
+% \li $M[0]=0$
+\li \For $i=1$ \To $n$ \Do
+\li     $M[i]=\infty$
+\li     \For $j=1$ \To $i$ \Do
+\li         $c=\proc{Get-Score}(i,j,n,E[j,i])$
+\li         $M[i]=min(M[i],M[j-1]+c)$
+        \End
+    \End
+\li \Return $M[n]$    
+\end{codebox}
+\begin{codebox}
+\Procname{$\proc{Get-Score}(i,j,n,g)$}
+\li $gaps=i-j$
+\li \If $g<0$ \textbf{and} $i==j$ \textbf{and} $i \neq n$ \Do
+\li     \Return $110000$
+\li \Else \If $g<0$
+\li     \Return $100000$
+\li \Else \If $i==j$ \textbf{and} $i==n$
+\li     \Return $0$
+\li \Else \If $i==j$
+\li     \Return $10000$
+% \li \Else \If $gaps==1$
+% \li     \Return $g \cdot g$
+\li \Else
+\li     $p0=g/gaps$
+\li     $p1=g/gaps+1$
+\li     \Return $(p1 \cdot p1 \cdot (g\%gaps))+p0 \cdot p0 \cdot (gaps-g\%gaps)$
+% \li     create $C[1..gaps]$ as an array
+% \li     set all entries of $C$ to 0
+% \li     $c=0$
+% \li     $mod=g$ \% $gaps$
+% \li     \If $mod==0$ \Do
+% \li         \Return $(g/gaps \cdot g/gaps) \cdot gaps$
+%         \End
+% \li     \For $k=1$ \To $gaps$ \Do
+% \li         $C[k]=g/gaps$
+%         \End
+% \li     \For $k=1$ \To $mod$ \Do
+% \li         $C[k]=C[k]+1$
+%         \End
+% \li     \For $k=1$ \To $gaps$ \Do
+% \li         $c=c+C[k] \cdot C[k]$
+%         \End
+% \li     \Return $c$
+    \End
+\end{codebox}
+\item \textbf{Correctness.} %A formal argument that your algorithm is
+%   correct.\\
+  To argue the correctness of the algorithm we claim two loop invariants for the inner loop of lines 14-16 and the outer loop of lines 12-16, respectively.
+  \begin{claim}
+  At the start of each iteration of the inner loop (lines 14-16), $M[i]$ is the minimum score computed for $S[k..i]+M[k-2]$, where $k$ is any value such that $1 \le k \le (j-1)$.
+  \end{claim}
+  \begin{claim}
+  At the start of each iteration of the outer loop (lines 12-16), $M[i-1]$ is the minimum score of all possible combinations of subproblems in the sequence $S[(1..(i-1)]$.
+  \end{claim}
+  \pagebreak
+  \begin{proof}
+  We prove the inner loop invariant holds by arguing the three properties.
+  \begin{enumerate}
+      \item \ul{Initialization:} First, we show that the loop invariant holds prior to the first iteration of the inner for loop when $j=1$. We see in this case that $k$ is necessarily equal to $1$ so the array index $M[k-2]=M[1-2]=M[-1]$ is outside of our array making the the loop invariant trivially true. Thus, the loop invariant holds prior to entering the loop for the first time.
+      \item \ul{Maintenance:} In this case, $j>1$. On line 15 we get the score for the specific subproblem $S[j..i]$. On line 16 we compare the current optimal solution, $M[i]$, with the combined score of a previous optimal solution $M[j-1]$ and the score, $c$ of our current subproblem $S[j..i]$. If the minimum score stored at $M[i]$ is less than $M[j-1]+c$, then we keep the score $M[i]$ since $M[i]$ is the current minimum score for all subproblems $S[k..i]$ and is less than $M[j-1]+c$, it is still the minimum score. When $j$ is incremented for the next iteration, the inner loop invariant is re-established.
+      \item \ul{Termination:} The condition causing the inner for loop to terminate is when $j=(i+1)$. The invariant implies that $M[i]$ is the minimum score for all combinations of subproblems from $S[1..i]$ and, therefore, contains the optimal solution from within that range.
+  \end{enumerate}
+  We should also mention the optimal substructure of the problem. Since $j$ always starts at 1, as seen in the initialization, on the first iteration we have the score of $S[j..i]=c+M[j-1]=M[0]$. Since $M[0]=0$, we have $c+0$ is necessarily the minimum score since it is less than $\infty$. Then by always taking the minimum score of this first score with the score of subsequent subproblems, we maintain the optimal solution for all subproblems which result in the optimal solution to the original problem. 
+  \end{proof}
+  \begin{proof}
+  We prove the outer loop invariant holds by arguing the three properties.
+  \begin{enumerate}
+      \item \ul{Initialization:} Prior to the first iteration of the outer loop of lines 12-16, when $i=1$, we show the loop invariant holds. Observe that when $i=1$, $M[i-1]=M[1-1]=M[0]$ and since all entries in $M$ are set to 0, we have that 0 is the minimum score which is true since we have not yet entered the loop or computed any scores. Moreover, $S[1..(i-1)]$ is an empty subarray making the invariant trivially true.
+      \item \ul{Maintenance:} In this case, $i>1$. On line 13 we first set $M[i]=\infty$ to ensure we get an optimal minimum solution from the computed subproblems. By the outer loop invariant we have $M[i-1]$ is the minimum score computed from all subproblems $S[1..(i-1)]$. At the end of each iteration, the termination property of the inner loop invariant tells us that $M[i]$ is the minimum score computed in the range $S[1..i]$. Since $M[i]$ is the minimum score and optimal solution computed from the subproblems in $S[1..i]$, when $i$ is incremented for the next iteration, the outer loop invariant is maintained.
+      \item \ul{Termination:} When the loop terminates $i=n+1$. The outer loop invariant tells us that $M[i-1]=M[n]$ is the minimum score for the entire sequence $S[1..n]$ and due to the optimal substructure of the problem, $M[n]$ is the optimal solution to the original problem. Hence, $\proc{Text-Justification}$ is correct.  
+  \end{enumerate}
+  \end{proof}
+  \begin{proof}
+  In the above loop invariant proofs, we assume the correctness of the helper procedure $\proc{Get-Score}$. We now argue the correctness of $\proc{Get-Score}$ to finalize our proof. The conditional statement and associated scores of lines 2-7 are clearly exact implementations of criteria (ii) and (iii) from the problem description such that a single word line longer than $w$ that is not on the last line is 110000 by (ii) and (iii) (lines 2-3), a line longer than $w$ has the score 100000 by (iii) (lines 4-5), if the last line contains one word the score is 0 by (ii) (lines 6-7), and if a line contains a single word and is not the last line is scored 10000 by (ii) (lines 8-9). %Lines 8-9 is when only two words are on a line, the problem description specifies the score as $(g-1)^2$. Since the algorithm subtracts the additional space automatically, we have $g^2=(g \cdot g)$. 
+  Lines 10-13 compute the score for all remaining cases by (i) and accounts for an uneven distribution of spaces. Specifically, $p0$ are the gaps with the base number of spaces (ignoring the remainder) and $p1$ are the gaps that take one additional space from the spaces left over as a remainder. To determine the number of gaps with an extra spaces we take the modulo of the total spaces and the number of gaps and multiply that by $p1^2$ to get the total score for the gaps with an extra space (if spaces in gaps are evenly distributed, this would be zero). We then add this score to the score computed for the remaining base gaps, $p0^2$ times the number of base gaps $gaps-g\%gaps$, to get the total score for that subproblem. Thus, $\proc{Get-Score}$ is correct.    
+  \end{proof}
+\item \textbf{Running Time.} %A statement of the running time of your
+%   algorithm and a formal argument that your algorithm runs in the
+%   stated time.\\
+  The running time of \proc{Text-Justification} is $\Theta(n^2)$. Observe that the creation of table $E$ and the time it takes to set all entries in the table to 0 is $\Theta((n+1) \cdot (n+1))=\Theta(n^2)$ based on the size of the table $E[0..n,0..n]$ and the creation and initialization of arrays $L$ and $M$ are linear based on their size. The nested loops of lines 8-11 takes $\Theta(n) \cdot \Theta(n) \cdot \Theta(1)=\Theta(n^2)$ since the outer loop iterates $n$ times and the inner loop iterates $n-1$ and all the work inside the loops is constant. The main loops of lines 12-16 takes $\Theta(n) \cdot \Theta(n) \cdot \Theta(1)=\Theta(n^2)$ since the outer loop iterates $n$ times, the inner loop iterates a maximum of $n$ times and all of the work done inside of the helper function $\proc{Get-Score}$ is $\Theta(1)$ since all work inside the function is done in constant time. Thus, ignoring the lower order terms, we have a total running time of $\Theta(n^2)+\Theta(n^2)+\Theta(n^2)=\Theta(n^2)$.  
+\end{enumerate}
+% If you are looking for an example of what is expected you may want to
+% examine at the model solutions for past problem sets.
+
+\section*{Self Reflection}
+% Respond to the following prompts in the final draft of your solution:.
+
+\begin{enumerate}
+% \item Is your solution correct?  Explain briefly.\\
+\item Overall I think my solution was on the right track (more correct than incorrect). 1.1. I believe the description does an okay job of explaining what the algorithm does although it is clearly a bit wordy and may be confusing in places. I struggled putting my understanding of the algorithm in words that would make sense to the reader. I think this is, in part due to the fact that I got too deep into the details. Since it is an informal description, I probably could have made some more general claims about what the algorithm does without getting bogged down in the details. 1.2. I think my algorithm is correct. It is very similar to yours for the most part but definitely not as elegant. I think all of the main components are there though. 1.3. I am not entirely sure about my correctness proof. I think I did a good job arguing my loop invariants but I am just not sure if the loop invariants create a sound proof for the optimal substructure of the problem. To resolve this, I tried to add brief argument for the optimal substructure at the end of the inner loop invariant but I am not sure if it is correct or if what I did is even appropriate in the loop invariant proof. I guess I didn't know how else to get that information in my proof. 1.4. I believe my argument for the running time is correct. It covers all of the main contributors to the running time and I think I made an okay argument about how I determined the running time. 
+% \item What did you do well and poorly?  Explain briefly.
+\item I think I did really well on coming up with the initial algorithm. I it fairly similar to your and I am pretty sure it works. I also think I did a good job arguing the running time. I think I also made improvements in keeping my wording more concise (in certain parts). I did a poor job arguing the correctness of the algorithm. I do not know how to say this but I feel like the proof I did was good but i don't think it actually proves the correctness of my algorithm, which is clearly not good. I also think I did a semi poor job giving a clear description of the algorithm.  
+% \item What material did you struggle with?  Explain briefly.
+\item My two main struggles were (1) coming up with an initial recursive algorithm and (2) proving my bottom-up algorithm. (1) I spent quite a bit of time trying to come up with the recursive algorithm because that is how I have created DP algorithms in the past. I was able to come up with with something but I do not think it was correct and I the deadline was getting closer and I didn't even have algorithm so I switched gears to bottom-up and did it from scratch. It ended up working out but I am still concerned that I was unable to identify the recursive algo. (2) I really struggled with the proof you mentioned in office hours that a I could use a proof by induction on $i$ and I understand the concept of proving optimal substructure via induction and it makes sense but I really struggled to make it into a formal proof. Again, since I was running out of time, I chose to argue loop invariants to the best of my ability despite know it is not the best way to argue the correctness.
+% \item What useful feedback did you incorporate from your groupmates?\\
+\item I had minimal feedback but I was able to incorporate a couple points. The main feedback I incorporated focused on making certain parts of my description and correctness proof more clear and easy to understand. The feedback I incorporated was helpful.
+% \item What useful feedback did you provide to your groupmates?\\
+\item I provided a lot of feedback since my groupmates problem set only partially completed. Specifically, the procedure names in the informal description did not match the procedure names in the actual algorithm (probably changed the names at some point and forgot to update). The description was only about three sentences, "this function returns this, this other function returns this, etc." so I gave feedback on adding a bit more detail regarding the \emph{how}, what the algorithm is doing to produce those results. In the actual algorithm there were three helper functions and one of them was never called in any of the other functions so it is never in the algorithm (he probably just missed the function call somewhere). The correctness proof argued 3-4 loop invariants but in a single argument "These are the loop invariants. Initialization is trivially true for all and holds for the maintenance cases as well." I told him to argue each loop invariant separately and to explain why initialization is trivially true for each case and gave an example. I also referred him to your ps01-soln.pdf for an example of a good loop invariant proof. The running time never made a claim about the total running time which I said he should state. The argument was just a table with the cost and executions for each line but the running time of individual lines was never put together to conclude a total running time so I said he should include that as well.  
+% \item What elements of writing are you going to focus on improving in
+%   future problem sets.\\
+\item As mentioned I think my writing is starting to be more concise in certain areas, so I have seen improvement there but plan to continue improving this. Specifically, I want to work on this in my informal descriptions. I think I am being much too formal in these descriptions which takes away from the clarity of what I am saying. I know the ability to explain something technical to an individual with no understanding of the subject is very important and clearly I still have a lot of room for improvement in this area.
+\end{enumerate}
+
+\end{document}

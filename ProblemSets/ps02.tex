@@ -1,0 +1,216 @@
+\documentclass[11pt]{article} 
+
+% ------- List of packages to import ------------
+\usepackage{fullpage}
+\usepackage{soul}
+\usepackage{url}
+\usepackage{pgf}
+\usepackage{tikz}
+\usetikzlibrary{arrows,automata}
+\usepackage[latin1]{inputenc}
+\usepackage{clrscode3e} % Documentation here http://www.cs.dartmouth.edu/~thc/clrscode/clrscode3e.pdf
+\usepackage{amssymb}
+\usepackage{amsmath}
+\RequirePackage[amsmath,hyperref,thmmarks]{ntheorem}
+\usepackage{hyperref} % This always has to be the LAST package.  
+
+\theoremseparator{.}
+
+% ------- Theorem and related environments --------
+\newtheorem{theorem}{Theorem}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition} 
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem{observation}[theorem]{Observation}
+\newtheorem{fact}[theorem]{Fact}
+
+% ------- Commands specifying theorem style -------
+
+\theoremstyle{nonumberplain}
+\theoremheaderfont{\normalfont\itshape}
+\theorembodyfont{\normalfont}
+\theoremsymbol{\ensuremath{_\blacksquare}}
+\newtheorem{proof}{Proof}
+
+% ------- Useful math macros -----------
+\newcommand{\NN}{\mathcal{N}} % Natural Numbers
+\newcommand{\RR}{\mathcal{R}} % Real Numbers
+\newcommand{\ZZ}{\mathcal{Z}} % Integers
+\newcommand{\QQ}{\mathcal{Q}} % Rational Numbers
+
+\newcommand{\set}[1]{\ensuremath{\{{#1}\}}} % Set
+\newcommand{\bigset}[1]{\ensuremath{\left\{{#1}\right\}}}
+\newcommand{\condset}[2]{\ensuremath{\set{{#1}\;|\;{#2}}}} % Conditional set
+\newcommand{\nin}{\not\in}
+\newcommand{\cross}{\times} % Cartesian product
+\newcommand{\ssn}{\subsetneq} % Proper subset
+\newcommand{\sse}{\subseteq} % Subset
+
+
+
+
+\begin{document}
+
+%% ^^^^^^^^^ Don't change anything above this line ^^^^^^^^^^^^^^^^
+
+
+
+\begin{center}
+
+{\LARGE
+\textsc{CSC 250 -- Algorithms -- Problem Set 2}
+\bigskip}
+
+\bigskip
+{\Large
+}
+
+
+\end{center}
+
+\section*{Problem 1}
+
+% Recall the binary search algorithm that you saw in CSC 10X, 120, 150,
+% or 151.  Binary search is a divide and conquer algorithm like
+% mergesort.
+% 
+\begin{enumerate}
+% \item Formally state the computational problem that binary search is
+%   solving.
+\item \textbf{Computational Problem:} \\
+\ul{Input:} A sorted sequence of $n$ elements, $A=<a_1,a_2,a_3,...,a_n>$, such that \\$a_1 \le a_2 \le a_3 \le ... \le a_n$, and a search value $t$. \\
+
+\ul{Output:} If $t$ is present in $A$, the index of $t$ in $A$ is returned. Otherwise, if $t$ is not present in $A$, a NotFoundError is raised.
+
+% \item There is a variant of binary search called \emph{hexanary
+%   search} that solves the same problem.  It works similarly to binary
+%   search, but instead of examining the middle element and to divide,
+%   it breaks the input into six (hence, ``hexa'') parts and decides
+%   which part to recurse on.  Give a recurrence for the runtime of
+%   hexanary search, and prove that the solution of your recurrence is
+%   $O(\log_2 n)$ using the substitution method.
+\item We start by identifying the recurrence for \emph{hexanary search} as $T(n)=T(n/6)+\Theta(1)$ since each recursive call divides the current array into six parts, the recursive work done at each level is $T(n/6)$ and the local work is constant, or $\Theta(1)$.
+\begin{claim}
+The solution to the recurrence $T(n)=T(n/6)+\Theta(1)$ is $O(log_2n)$.
+\end{claim}
+\begin{proof}
+By strong induction on $n$, we show that $T(n) \le b \cdot log_2n+c$ is the solution to the recurrence using substitution. \\
+\\
+First, we show the solution holds for the base case, $n=1$. \\
+\\
+\ul{Base Case $(n=1)$:} \\
+$T(1)=\Theta(1)=c$ \\
+$T(1) \le b \cdot log_21+c$ \\
+\phantom{T(1) }$=b \cdot 0+c$ \\
+\phantom{T(1) }$=c$ \\
+\\
+Since $c \le c$ we conclude that the base case holds. \\
+\\
+\ul{Induction Step $(n>1)$:} \\
+Induction Hypothesis: For all integers $n>1$, suppose $m<n$. We show if $T(m) \le b \cdot log_2m+c$ is true, then $T(n) \le b \cdot log_2n+c$ is also true. \\
+
+$T(n)=T(n/6)+\Theta(1)$ \\
+\phantom{T(n) }$=T(n/6)+c$ \\
+By the Induction Hypothesis we substitute in $T(m)$ where $m=n/6$ \\
+\phantom{T(n) }$\le b \cdot log_2(n/6)+c+c$ \\
+\phantom{T(n) }$=b \cdot (log_2n-log_26)+2c$ \\
+\phantom{T(n) }$=b \cdot log_2n-b \cdot log_26+2c$ \\
+Since $b$ can be any constant, we substitute in the value $b=\left(\frac{c}{log_26}\right)$ \\
+\phantom{T(n) }$=\left(\frac{c}{log_26}\right) \cdot log_2n-\left(\frac{c}{log_26}\right) \cdot log_26+2c$ \\
+\phantom{T(n) }$=\left(\frac{c}{log_26}\right) \cdot log_2n-c+2c$ \\
+Substituting our constant $b$ back into the equation we get \\
+\phantom{T(n) }$=b \cdot log_2n+c$ \\
+\\
+Thus, $T(n) \le b \cdot log_2n+c$ holds and \emph{hexanary search} has a runtime of $O(log_2n)$.
+\end{proof}
+\end{enumerate}
+
+\section*{Problem 2}
+% Each each of the following recurrences either: use the Master Theorem
+% to solve for tight bounds, or argue that the Master Theorem does not
+% apply.
+\begin{enumerate}
+\item $T(n) = 4 T(n / 2) + n^{.123}$ \\
+\\
+In the recurrence, $a=4$, $b=2$, and $f(n)=n^{.123}$, so $n^{log_ba}=n^{log_24}=n^2$. We can see that $n^2$ is polynomially larger than $f(n)$ since $f(n)=O(n^{2-\epsilon})$ for $\epsilon \approx 1.88$. Thus, case 1 applies and $T(n)=\Theta(n^2)$.
+\item $T(n) = 2 T(n / 2) + n \log n$ \\
+\\
+In the recurrence, $a=2$, $b=2$, and $f(n)=nlogn$, so $n^{log_ba}=n^{log_22}=n$. We see that the ratio of $\left(\frac{f(n)}{n^{log_ba}}\right)=\left(\frac{nlogn}{n}\right)=logn$ which is asymptotically less than $n^\epsilon$ for any positive constant $\epsilon$. Thus, this recurrence is in the "gap" between cases 2 and 3 so the Master Theorem does not apply. 
+\item $T(n) = 2 T(n / 4) + n$ \\
+\\
+In the recurrence, $a=2$, $b=4$, and $f(n)=n$, so $n^{log_ba}=n^{log_42}=n^{0.5}$. We can see that $n^0.5$ is polynomially smaller than $f(n)$ since $f(n)=\Omega(n^{0.5+\epsilon})$ for $\epsilon =0.5$ which indicates that case 3 applies as long as we show the regularity condition for $f(n)$ holds. We must show $af(n/b) \le cf(n)$ for a constant $c<1$ for all sufficiently large $n$. So for $c=1/2$, $2(n/4) \le (1/2)n=(n/2) \le (n/2)$. Thus, case 3 applies and we get $T(n)=\Theta(n)$.
+\end{enumerate}
+
+\section*{Problem 3}
+
+% Come up with the tightest asymptotic upper bound solving the
+% recurrence $$T(n) = T(n-1) + T(n-2) + T(n-3)$$ you can where $T(0) =
+% 0, T(1) = T(2) = 1$.  Prove, using any approach, that this bound
+% holds.
+\begin{claim}
+An upper bound on the recurrence $T(n)=T(n-1)+T(n-2)+T(n-3)$ is $O(2^n)$.
+\end{claim}
+\begin{proof}
+By strong induction on $n$, we prove \textbf{Claim 2} using substitution. \\
+\\
+By the recursion tree method, we see the recurrence is at most $n-1$ levels deep and has a degree of 3, so at most there are $3^n$ leaves. However, when the base case is $T(0)$, 0 work is done. Moreover, since the three child nodes of each parent node decrease at different rates, not all of the leaves are at the deepest level of the recursion tree which indicates that $3^n$ is not a \emph{tight} upper bound. Therefore we guess a tight upper bound on the recurrence is $T(n) \le 2^n$. \\
+\\
+\ul{Base Cases ($n=0$ and $n=1$ and $n=2$):} \\
+$T(0)=0=c_0$ \\
+$T(0) \le 2^n=2^0=1$ \\
+\phantom{T1}$c_0 \le 1$ \\
+\\
+$T(1)=1=c_1$ \\
+$T(1) \le 2^n=2^1=2$ \\
+\phantom{T1}$c_1 \le 2$ \\
+\\
+$T(2)=1=c_2$ \\
+$T(2) \le 2^n=2^2=4$ \\
+\phantom{T1}$c_2 \le 4$ \\
+\\
+Thus, the base cases hold for the guess $2^n$. \\
+\\
+\ul{Induction Step ($n>2$):} \\
+Induction Hypothesis: For all integers $n>2$, suppose $m<n$. We show if $T(m) \le 2^m$ is true, then $T(n) \le 2^n$ is also true. \\
+\\
+$T(n)=T(n-1)+T(n-2)+T(n-3)$ \\
+\\
+By the Induction Hypothesis we get \\
+\\
+\phantom{T(n) }$\le 2^{n-1}+2^{n-2}+2^{n-3}$ \\
+\\
+So we can show this is less than or equal to $2^n$ with a summation \\
+\\
+$T(n) \le \sum\limits_{i=0}^{n-1}2^i=2^n-1 \le 2^n$ \\
+\\
+Thus, $T(n) \le 2^n$ is true and shows $O(2^n)$ is an upper bound of the recurrence.
+\end{proof}
+
+\section*{Self Reflection}
+
+% Respond to the following prompts in the final draft of your solution:.
+
+\begin{enumerate}
+% \item Is your solution correct?  Explain briefly. \\
+\item For question 1.1 my solution differs from your solution but I believe it is correct because I provided output for a binary search algorithm that returns the index of $t$ if found, otherwise an error instead of an algorithm that returns true or false. I also, believe my solution for question 1.2 is correct although I wen about it slightly differently. Instead of using 5 for local work, I reduced it down to $\Theta(1)$ and called it the constant $c$ which I believe works. I am still a bit confused about the use of "5" in your solution. I thought that regardless of the amount of constant local work, we can (and should?) always just reduce it to a single constant. \\
+For all of Problem 2 it looks like my solutions are correct and are more or less in line with your solutions. \\
+For Problem 3 my solution corresponded to your "Weak Bound" solution. I struggled to use the recursion tree method since not all of the leaves were at the bottom level and I was unsure about how address this issue. As a result, I used substitution and based my guess off the general intuition I gained from the recursion tree method. I believe my substitution, more or less, works but I am not sure if I gave sufficient justification in the induction step. 
+% \item What did you do well and poorly?  Explain briefly. \\
+\item I think I did well implementing the Master Theorem in Problem 2. I also felt fairly confident on Problem 1 based on my current understanding of substitution (which may have some holes in it). I feel I did poorly on Problem 3. I was unsuccessful in coming up with a proof via recursion tree so I decided to use the substitution method and even then I am not confident that my proof fully accounts for everything it should. 
+% \item What material did you struggle with?  Explain briefly.
+\item I definitely struggled the most with Problem 3, specifically using the recursion tree method. In lecture and reading the textbook, I felt pretty confident with recursion trees. Unfortunately, I found my understanding was lacking a bit as soon as the recurrences moved away from the basic $T(n)=T(n/2)+ \Theta(1)$ format. This is definitely something I will need to spend some additional time working through and I think the solutions you provided are a great place to start.
+% \item What useful feedback did you incorporate from your groupmates?
+\item Last week I mentioned that I wanted to improve my writing be making my proofs and explanations more concise. A lot of the feedback I received this week helped me do exactly that. On nearly every problem I was able to remove statements to make my technical writing more concise. For example I would say something like "Therefore, c<=c is true and as a result, it holds, thus it is correct." My groupmate helped me see that "Since c<=c we conclude it holds" expressed the same thing in a much more concise way. There were several corrections like this, all of which I implemented to some degree. There was also some feedback about giving additional justification in part of Problem 3 which I tried to add to the best of my ability.
+% \item What elements of writing are you going to focus on improving in
+% future problem sets? \\
+\item On future problem sets I still want to continue making my writing more concise the first time through and not have to depend on feedback to accomplish it. I also plan to focus on making more detailed/comprehensive proofs. At times I will skip steps in the math or fail to provide written justification for the math. I plan to focus on developing a better step-by-step process where I make sure everything is accounted for and the previous step logically implies/justifies the following step.    
+\end{enumerate}
+
+
+%% VVVVVVVVVVV Don't change anything below this line VVVVVVVVVVVVVVV
+
+\end{document}

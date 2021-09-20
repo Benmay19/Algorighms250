@@ -1,0 +1,321 @@
+\documentclass[11pt]{article} 
+
+% ------- List of packages to import ------------
+\usepackage{fullpage}
+\usepackage{soul}
+\usepackage{url}
+\usepackage{pgf}
+\usepackage{tikz}
+\usetikzlibrary{arrows,automata}
+\usepackage[latin1]{inputenc}
+\usepackage{clrscode3e} % Documentation here http://www.cs.dartmouth.edu/~thc/clrscode/clrscode3e.pdf
+\usepackage{amssymb}
+\usepackage{amsmath}
+\RequirePackage[amsmath,hyperref,thmmarks]{ntheorem}
+\usepackage{hyperref} % This always has to be the LAST package.  
+
+\theoremseparator{.}
+
+% ------- Theorem and related environments --------
+\newtheorem{theorem}{Theorem}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition} 
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem{observation}[theorem]{Observation}
+\newtheorem{fact}[theorem]{Fact}
+
+% ------- Commands specifying theorem style -------
+
+\theoremstyle{nonumberplain}
+\theoremheaderfont{\normalfont\itshape}
+\theorembodyfont{\normalfont}
+\theoremsymbol{\ensuremath{_\blacksquare}}
+\newtheorem{proof}{Proof}
+
+% ------- Useful math macros -----------
+\newcommand{\NN}{\mathcal{N}} % Natural Numbers
+\newcommand{\RR}{\mathcal{R}} % Real Numbers
+\newcommand{\ZZ}{\mathcal{Z}} % Integers
+\newcommand{\QQ}{\mathcal{Q}} % Rational Numbers
+
+\newcommand{\set}[1]{\ensuremath{\{{#1}\}}} % Set
+\newcommand{\bigset}[1]{\ensuremath{\left\{{#1}\right\}}}
+\newcommand{\condset}[2]{\ensuremath{\set{{#1}\;|\;{#2}}}} % Conditional set
+\newcommand{\nin}{\not\in}
+\newcommand{\cross}{\times} % Cartesian product
+\newcommand{\ssn}{\subsetneq} % Proper subset
+\newcommand{\sse}{\subseteq} % Subset
+
+
+
+
+\begin{document}
+
+%% ^^^^^^^^^ Don't change anything above this line ^^^^^^^^^^^^^^^^
+
+
+
+\begin{center}
+
+{\LARGE
+\textsc{CSC 250 -- Algorithms -- Problem Set 1}
+\bigskip}
+
+\bigskip
+{\Large
+}
+
+
+\end{center}
+
+% VVVVVVVV Comment out the tutorial below when submitting VVVVVVVVVV
+
+\section*{\LaTeX{} Tutorial}
+
+You will use \LaTeX{} to typeset your solutions to problems in this
+course.  You will be provided with a template \texttt{.tex} file for
+each problem set that you should modify to typeset your solutions (in
+this case \texttt{ps01.tex}).  Below is a brief introduction to
+\LaTeX{}.  You can skip this and get right to the problems if you
+already know how to use \LaTeX{}.
+
+\LaTeX{} is a programming language for typesetting documents, and is
+widely used to prepare scientific papers and textbooks.  Applications
+like Microsoft Word and Google Docs are WYSIWYG editors (What You See
+Is What You Get), that is, the editor displays the document as it
+would be printed.  WYSIWYG editors for better (or worse) allow you
+near complete control over how a document is formatted---leaving the
+writer to ensure that everything is consistently formatted and
+styled. \LaTeX{} on the other hand is not a WYSIWYG editor, instead
+you prepare your document by writing a \LaTeX{} program in
+\texttt{.tex} file, and then compile it into a document (usually a PDF
+file).\footnote{HTML is similar in this regard.}  The beauty of
+\LaTeX{} is that it allows you to specify the overall format and style
+of the document, then when you compile your document it consistently
+applies the format and style to your content without you have to worry
+about the details.  Another benefit of \LaTeX{} is the ease with which
+you can write mathematical expressions.
+
+\LaTeX{} is open source and free.  You can download its compiler, many
+packages, and various editors on your personal machine if you choose.  
+You are welcome to use any tool that compiles \texttt{.tex} into
+\texttt{.pdf}.  That said, for ease of use, it is suggested that you
+use the cloud-based editor Overleaf (\url{https://www.overleaf.com}).
+
+Below are a number of examples of using \LaTeX{} for typesetting.
+\ul{I suggest looking at \texttt{ps01.tex} while reading through the
+  examples to see the code that produces them.  Use these examples as
+  a basis for typesetting your problem set solutions!}
+
+\subsection*{Text}
+
+Any text you type into your \LaTeX{} file will appear as the text does
+in this sentence.  You can use various commands to change how text
+appears:
+
+\begin{itemize}
+\item Text face: \textbf{bold}, \emph{italics}, \ul{underlined},
+  \st{strikethrough}.
+\item Text size: {\tiny tiny}, {\footnotesize footnote size}, {\small
+  small}, {\normalsize normal}, {\large large}, {\Large Large},
+{\LARGE LARGE}, {\Huge Huge}
+\end{itemize}
+
+\subsection*{Math}
+
+\LaTeX{} makes typesetting math easy!  
+\begin{itemize}
+\item It can produce Greek symbols,
+$\alpha, \beta, \delta, \epsilon, \varepsilon, \gamma, \lambda,
+\sigma, \pi, \phi, \iota, \omega, \ldots$ and capital variants,
+$\Gamma, \Lambda, \Sigma, \ldots$ 
+\item Subscripting and superscripting are
+also easy: $2^2, 2^{2^2},2^{2^{2^2}}, w_i,w_{i_j},w_{i_{j_k}},q_0^A$ $\left(\frac{0}{1}\right)^p\left(\frac{1}{0}\right)^p$.
+\item There are many built-in operators: $+, -, \cdot, /, \sum, \prod, =,
+\neq, \equiv, \le, \ge, \cross, \circ, \rightarrow, \leftarrow,
+\leftrightarrow, \Rightarrow, \Leftarrow, \Leftrightarrow, \in, \nin,
+\sse, \ssn, \cup, \cap$.  
+\item You can define sets: $\NN =
+\set{1,2,3,\ldots}$, $\text{EVEN} = \condset{n \in \NN}{n \equiv 0
+  \mod 2}$.  
+\end{itemize}
+Inline math is produced by in-closing text within dollar
+signs \texttt{\$}.  You can make mathematical statements appear on
+their own lines by using double dollar signs \texttt{\$\$} around
+them:
+$$2,3,5,7,11,13,17,19,\ldots$$ Here's a reference for math commands:
+\url{https://en.wikibooks.org/wiki/LaTeX/Mathematics}
+
+
+\subsection*{Environments}
+
+An \emph{environment} is \LaTeX{}'s term for a formatting style that
+can be applied to a region of content.  For example there are
+environments for definitions, theorems, lemmas, claims, and proofs (a
+complete list of the available math environments can be found at the
+top of \texttt{ps01.tex}).
+
+\begin{definition}
+\label{def:prime}
+A number $n \in \NN$ is \emph{prime} iff its only divisors are itself
+and 1.
+\end{definition}
+
+\begin{theorem}
+There are infinitely many prime numbers.
+\end{theorem}
+
+\begin{proof}
+Suppose there are only finitely many prime numbers $1 < p_1 < p_2 <
+\ldots < p_n$.  Consider the number $q = 1 + \prod_{i = 1}^n p_i$.
+Recalling Definition~\ref{def:prime}\footnote{You can make references
+  to things you've written by using the \texttt{label} and
+  \texttt{ref} commands.}, observe that $q$ is not divisible by any of
+the primes $p_1,p_2,\ldots,p_n$ because $q \equiv 1 \mod p_i$ for all
+$i = 1,\ldots,n$.  Therefore $q$ is prime.  This is a contradiction
+because $q \neq p_i$ for all $i = 1,\ldots,n$.
+% Note you cannot leave a blank line here or it will won't put the
+% closing \blacksquare.
+\end{proof}
+
+You can create (nested) bulleted lists using the \texttt{itemize}
+environment as above in the math section.  You can use the
+\texttt{enumerate} environment to create numbered lists, as is done in
+the optional exercises section below.
+
+\subsection*{Algorithm}
+
+Our textbook provides a \LaTeX{} package called \texttt{clrscode3e}
+for typeseting algorithms.  To use this you'll need to download
+\texttt{clrscode3e.sty} off of Nexus and put it in the same folder as
+your \texttt{ps01.tex} file.  The algorithm you'll be analyzing can be
+found in Problem 1.
+
+
+
+\subsection*{\LaTeX{} Tips}
+
+\begin{enumerate}
+\item \LaTeX{} compile error messages can be arcane though they
+  usually give you a line number.  Check that line.  If the error is
+  complete nonsense it is likely you have misplaced a
+  \texttt{$\backslash$, \{, \},} or \texttt{\$} somewhere before that
+  point.  Comment out lines using the percent character \texttt{\%} to
+  isolate the error.
+\item Don't reinvent the wheel!  Start from the example code that I've
+  provided with this template.  
+\item You do not need to understand too much \LaTeX{} to be able to
+  produce professional-looking solutions for this class.  If you get
+  stuck on something: talk with your peers, search the Internet
+  (\url{http://tex.stackexchange.com/} is a useful resource), or talk
+  with me!
+\item \LaTeX{} has \emph{many} more features than I have time to describe, I
+  encourage you to explore them on your own.  One particularly useful
+  feature is creating user-defined macros with \texttt{newcommand}.
+\item Solve a problem completely \emph{before} writing it up in
+  \LaTeX{} (otherwise, you may find yourself with two problems).
+\end{enumerate}
+
+\pagebreak
+
+
+\section*{Required Problems}
+
+\noindent Solve the following problems and typeset your solutions
+within this document.  Before compiling this document for submission
+comment (or delete) out this paragraph and the above \LaTeX{}
+tutorial.  To hand in your solution electronically submit
+\texttt{ps01.pdf} to Gradescope.
+
+% ^^^^^^^^^^^ Comment out the above when submitting ^^^^^^^^^^^^^^^^^^
+
+\section*{Problem 1 (60\%)}
+
+Bubblesort is a popular, but inefficient, sorting algorithm.  It works
+by repeatedly swapping adjacent elements that are out of order.
+
+\begin{codebox}
+\Procname{$\proc{Bubblesort}(A)$}
+\li \For $i \gets 1$ \To $\attrib{A}{length} - 1$ \Do
+\li     \For $j \gets \attrib{A}{length}$ \Downto $i + 1$ \Do
+\li         \If $A[j] < A[j-1]$ \Do
+\li             exchange $A[j]$ with $A[j-1]$.
+            \End
+        \End
+    \End
+\end{codebox}
+
+\begin{enumerate} 
+\item Let $A'$ denote the output of $\proc{Bubblesort}(A)$ and $n =
+  \attrib{A}{length}$.  To prove that $\proc{Bubblesort}$ sorts, we
+  need to prove that
+  \begin{enumerate}
+  \item it terminates on all inputs,
+  \item its output satisfies the property
+    \begin{equation}
+      A'[1] \le A'[2] \le \cdots \le A'[n], \text{ and}\label{eqn:ordered}
+    \end{equation}
+  \item \texttt{XXX}.
+  \end{enumerate}
+  What is the missing property \texttt{XXX}?  In \emph{one} sentence,
+  argue why this additional property holds for \proc{Bubblesort}.
+  
+\item State precisely a loop invariant for the inner \For loop in
+  lines 2--4.  (Hint: Consider what happens to $A[1..(i-1)]$ and
+  $A[i..n]$.)
+
+\item State precisely a loop invariant for the outer \For loop in
+  lines 1--4 that will allow you to prove~\eqref{eqn:ordered}.  (Hint:
+  Think about the insertion sort loop invariant proof from class.)
+
+\item Prove the inner loop invariant you stated holds.  Make sure to
+  argue the three properties initialization, maintenance and
+  termination.
+  
+\item Prove the outer loop invariant you stated holds to conclude that
+  \proc{Bubblesort} sorts.  Note that because you proved the inner
+  loop invariant in the previous part, if you can establish the
+  initialization condition of the inner loop invariant you can
+  immediately conclude its termination property. 
+
+\item What is the worst-case running time of bubblesort?  How does it
+  compare to the running time of insertion sort?
+\end{enumerate}
+
+
+\section*{Problem 2 (30\%)}
+
+Prove the following lemma.
+
+\begin{lemma}
+For any natural number $a$ and real number $b > 0$,
+$$(b \cdot n + a! \cdot \sqrt{n})^b = \Theta(n^b).$$
+\end{lemma}
+
+\begin{proof}
+
+\end{proof}
+
+
+
+\section*{Self Reflection (10\%)}
+
+For your final draft, read my posted solution and then respond to the following prompts:
+\begin{enumerate}
+
+\item Is your solution correct?  Give a concrete accounting in
+  comparison with my posted solution.  (Note: Your solution doesn't
+  need to match mine to be correct.)
+\item What did you do well and poorly? Explain briefly.
+\item What material did you struggle with? Explain briefly.
+\item What elements of writing are you going to focus on improving in future problem sets?
+  
+\end{enumerate}
+
+%% VVVVVVVVVVV Don't change anything below this line VVVVVVVVVVVVVVV
+
+\end{document}

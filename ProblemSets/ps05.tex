@@ -1,0 +1,247 @@
+\documentclass[11pt]{article} 
+
+% ------- List of packages to import ------------
+\usepackage{fullpage}
+\usepackage{soul}
+\usepackage{url}
+\usepackage{pgf}
+\usepackage{tikz}
+\usepackage{enumitem}
+\usetikzlibrary{arrows,automata}
+\usepackage[latin1]{inputenc}
+\usepackage{clrscode3e} % Documentation here http://www.cs.dartmouth.edu/~thc/clrscode/clrscode3e.pdf
+\usepackage{amssymb}
+\usepackage{amsmath}
+\RequirePackage[amsmath,hyperref,thmmarks]{ntheorem}
+\usepackage{hyperref} % This always has to be the LAST package.  
+
+\theoremseparator{.}
+
+% ------- Theorem and related environments --------
+\newtheorem{theorem}{Theorem}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition} 
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem{observation}[theorem]{Observation}
+\newtheorem{fact}[theorem]{Fact}
+
+% ------- Commands specifying theorem style -------
+
+\theoremstyle{nonumberplain}
+\theoremheaderfont{\normalfont\itshape}
+\theorembodyfont{\normalfont}
+\theoremsymbol{\ensuremath{_\blacksquare}}
+\newtheorem{proof}{Proof}
+
+% ------- Useful math macros -----------
+\newcommand{\NN}{\mathcal{N}} % Natural Numbers
+\newcommand{\RR}{\mathcal{R}} % Real Numbers
+\newcommand{\ZZ}{\mathcal{Z}} % Integers
+\newcommand{\QQ}{\mathcal{Q}} % Rational Numbers
+
+\newcommand{\set}[1]{\ensuremath{\{{#1}\}}} % Set
+\newcommand{\bigset}[1]{\ensuremath{\left\{{#1}\right\}}}
+\newcommand{\condset}[2]{\ensuremath{\set{{#1}\;|\;{#2}}}} % Conditional set
+\newcommand{\nin}{\not\in}
+\newcommand{\cross}{\times} % Cartesian product
+\newcommand{\ssn}{\subsetneq} % Proper subset
+\newcommand{\sse}{\subseteq} % Subset
+\newcommand{\ttt}[1]{\texttt{{#1}}}
+
+
+
+\begin{document}
+
+%% ^^^^^^^^^ Don't change anything above this line ^^^^^^^^^^^^^^^^
+
+
+
+\begin{center}
+
+{\LARGE
+\textsc{CSC 250 -- Algorithms -- Problem Set 5}
+\bigskip}
+
+\bigskip
+
+\end{center}
+
+% \section*{Suggested Optional Exercises}
+
+% You may find it useful to solve the following exercises.
+
+% \begin{enumerate}
+% \item Exercise 15.1-2
+% \item Exercise 15.1-4
+% \item Exercise 15.3-2
+% \item Exercise 15.3-6
+% \item Exercise 15.4-5
+% \end{enumerate}
+
+\section*{Problem 1}
+
+% A \emph{palindrome} is a string that reads the same forward as it does
+% backwards.  For example, the words \ttt{eye}, \ttt{racecar},
+% \ttt{madam}, \ttt{aibohphobia} are all palindromes.  This problem is
+% interested in finding long palindromic subsequences in strings, that
+% is, subsequences that are palindromes.  For example, the string
+% \ttt{\ul{s}ubs\ul{e}que\ul{n}c\ul{e}s\ul{ t}h\ul{at }ar\ul{e}
+%   pali\ul{n}drom\ul{es}} contains (underlined) the palindromic
+% subsequence \ttt{sene tat enes}.  The Longest Palindromic Subsequence
+% (LPS) problem is defined as follows.
+
+% \bigskip
+
+% \noindent\textbf{Longest Palindromic Subsequence}
+% \begin{itemize}
+% \item[] \textbf{Input:} A string $s$ of length $n$.
+% \item[] \textbf{Output:} The length of a longest subsequence of $s$
+%   that is a palindrome.
+% \end{itemize}
+
+% \noindent Develop and analyze an efficient dynamic programming algorithm for the
+% LPS problem.  In particular your solution should include:
+\begin{enumerate}
+\item \textbf{Description.} %An informal, intuitive description of your
+%   dynamic programming algorithm written in English.  This description
+%   should indicate the choice(s) your algorithm is making, and the
+%   subproblems it considers. \\
+  We apply Dynamic Programming to identify the length of the longest palindromic subsequence of the string $s$. We start with a wrapper function $\proc{LPS}$ which takes the string $s$ as an argument and creates a table $M[1..n,1..n]$, where $n$ is the length of the string $s$, to store the memoized values of the different possible subproblems, and initialize all entries in $M$ to $UNKNOWN$. We then call our recursive function $\proc{LPS-Value}$ and pass as arguments the original string $s$, our table $M$, and the first and last indices, $i=1$ and $j=n$, of $s$. \\
+  \\
+  $\proc{LPS-Value}$ first checks the base cases. Line 1 checks if $i>j$, if the condition is satisfied we have looked at the entire string leaving us with a trivially empty subproblem, so we return 0. The second base case of line 3, if $i=j$, checks if our subproblem is a single character, which is itself a palindrome, so we return 1 which will be added to the total length of the longest palindromic subsequence. Our final base case of line 5 checks if the entry stored in our table at $M[i,j]$ is not equal to $UNKNOWN$. If this value is not $UNKNOWN$ it means we have already computed the value to this subproblem, so we return that value instead of recomputing the value. If the value at entry $M[i,j]$ is still $UNKNOWN$ we move to the recursive cases. Line 7 checks if the character at $s[i]$ is equal to the character at $s[j]$. If satisfied, these two characters are part of a palindrome so we add 2 to the total length of our palindrome and recursively call $\proc{LPS-Value}$ on a smaller subproblem by incrementing $i$ by one, decrementing $j$ by one, and storing this solution in the memoization table. We decrease the length of the sub problem at both ends since the two characters form part of a palindrome, we do not need to compare those character with any others. If the condition of Line 7 fails, we move into the else statement of lines 9-10. It is at this point in the algorithm where we make our \emph{choice}. Specifically, should we keep the character in $s$ at position $i$ and compare it with character at position $j-1$ or keep the character at $j$ and compare it with the character at position $i+1$? In other words, should we keep the first character in the string and remove the last or keep the last character and remove the first? Both choices create a subproblem one character smaller than the previous problem such that our choices produce the subproblems $s[i..(j-1)]$ and $s[(i+1)..j]$ respectively. Together, these two choices ensure that all possible palindromic combinations are tested for, and only the maximum of the two solutions is stored in the memoization table for the current state. The recursive cases continue until we reach a base case at which point we combine (add up) the solutions to all of our subproblems, keeping only the subproblem solutions with the maximum value in line 10. Thus, having combined the optimal solutions to our subproblems to get the optimal solution to the original problem and storing it in our memoization table, we return that optimal solution form the table in line 11.\\
+  \newpage
+\item \textbf{Algorithm.} %A formal statement of your algorithm written
+%   using the codebox environment.
+  \begin{codebox}
+  \Procname{$\proc{LPS}(s)$}
+  \li $n=s.length$
+  \li let $M[1..n,1..n]$ be a new table
+  \li set entries of $M$ to $UNKNOWN$
+  \li return $\proc{LPS-Value}(s,M,1,n)$
+  \end{codebox}
+  \begin{codebox}
+  \Procname{$\proc{LPS-Value}(s,M,i,j)$}
+  \li \If $i>j$ \Do
+  \li   \Return $0$
+      \End    
+  \li \If $i==j$ \Do
+  \li   \Return $1$
+      \End
+  \li \If $M[i,j] \neq UNKNOWN$ \Do
+  \li   \Return $M[i,j]$
+      \End
+  \li \If $s[i]==s[j]$ \Do
+  \li   $M[i,j]=\proc{LPS-Value}(s,M,i+1,j-1)+2$
+  \li \Else
+  \li   $M[i,j]=max(\proc{LPS-Value}(s,M,i,j-1),\proc{LPS-Value}(s,M,i+1,j))$
+      \End
+  \li \Return $M[i,j]$
+  \end{codebox}
+\item \textbf{Correctness.} %A formal argument that your algorithm is
+%   correct. \\
+We show the correctness of our algorithm by first showing the correctness of the basic recursive algorithm, $\proc{LPS-Rec}$, then arguing the changes made to $\proc{LPS-Rec}$ to make our memoized algorithm, $\proc{LPS-Value}$, are correct as well.
+\begin{codebox}
+  \Procname{$\proc{LPS-Rec}(s,i,j)$}
+  \li \If $i>j$ \Do
+  \li   \Return $0$
+      \End    
+  \li \If $i==j$ \Do
+  \li   \Return $1$
+      \End
+  \li \If $s[i]==s[j]$ \Do
+  \li   \Return $\proc{LPS-Rec}(s,i+1,j-1)+2$
+  \li \Else
+  \li   \Return $max(\proc{LPS-Rec}(s,i,j-1),\proc{LPS-Rec}(s,i+1,j))$
+      \End
+\end{codebox}
+\begin{proof}
+  By strong induction on $n$ where $n=(j-i+1)$ and is a non-negative integer, we show the correctness of $\proc{LPS-Rec}$, by arguing that for any string $s$ of any length $n$, we can identify the longest palindromic subsequence contained in $s$.\\
+  \\
+  \ul{Base Cases ($(i>j)=(n=0)$) and ($(i=j)=(n=1)$):}\\
+  \textbf{Case 1.} In the first base case, when $i>j$, we have an empty string of length 0. Clearly, an empty string cannot contain a palindromic subsequence so we return 0 as the length of of the longest palindromic subsequence.\\
+  \textbf{Case 2.} In the second base case, when $i==j$, we have a string containing a single character. Since a single character is itself a palindrome, we return 1 as the length of the longest palindromic subsequence.\\
+  \\
+  \ul{Induction Step ($(i<j)=(n>1)$):}\\
+  Induction Hypothesis: For all strings of length $n>1$, suppose all $m<n$. We show if $\proc{LPS-Rec}$ is correct for all smaller subproblems of some length $m$, it is correct for the original problem of length $n$ as well.\\
+  \\
+  When $n>1$ and we enter the recursive cases of lines 5-8, the length of the string is either decreased by 2 on line 6, such that $m=(n-2)$ and produces the subproblem $s[(i+1)..(j-1)]$, or decreased by 1 for both recursive cases of line 8, such that $m=(n-1)$ and produces the subproblems $s[i..(j-1)]$ and $s[(i+1)..j]$ respectively. By the induction hypothesis we know that the algorithm is correct for strings of length $m<n$ as well. Therefore, when line 5 is satisfied, we have identified a solution to the current subproblem so we keep the value of the current solution to be combined with the solutions of subsequent subproblems to produce an optimal solution to the original problem of length $n$. %Specifically, the solution we save is the value 2 for the two characters identified as a palindromic subsequence. 
+  If the condition of line 5 fails, line 8 is executed and makes a choice to decreases the size of the subproblem in two different ways and keep only the maximum value produced by the two different subproblems. On each subsequent recursive call we further reduce the length of the string and solve the new, smaller subproblems until we reach a base case. \\
+  We show that combining the solutions to the subproblems yields an optimal solution to the original problem of length $n$ by arguing that $\proc{LPS-Rec}$ has an optimal substructure. Following the logic of \textbf{Theorem 15.1} in the CLRS textbook, we see that the longest palindromic subsequence in the string $s$ having length $n$, denoted $s_n=s[i..j]$, contains within it the longest palindromic subsequence of $s_m$ where $m$ is determined based on three cases. \\
+  \\
+  \textbf{Case 1.} If $s[i]==s[j]$, we get the subproblem, $s_m=s_{n-2}=s[(i+1)..(j-1)]$.\\
+  \textbf{Case 2.} If $s[i] \neq s[j]$, we get the subproblem, $s_m=s_{n-1}=s[i..(j-1)]$.\\
+  \textbf{Case 3.} If $s[i] \neq s[j]$, we get the subproblem, $s_m=s_{n-1}=s[(i+1)..j]$.\\
+  \\
+  Where only the optimal solution of cases 2 and 3 are kept for any given subproblem. %As a result, our problem has an optimal substructure, so by combining the optimal (maximum value) solutions to the subproblems, we obtain an optimal solution to the original problem. Moreover, since we check for the longest palindromic subsequence of $s$ by making comparisons from right to left and left to right in line 8 and only combine the solution with the maximum value, we ensure an optimal solution to the original problem of length $n$. 
+  Thus, we conclude our problem has optimal substructure and that solving all of the possible subproblems and combining the maximum value determined for each subproblem, yields the optimal solution to the original problem.\\
+  \\
+  Having shown the correctness of $\proc{LPD-REC}$, we now argue our memoized algorithm is correct as well. In $\proc{LPS-Value}$, the main work of the algorithm is still completed in the recursive cases of lines 7-10, so the correctness of $\proc{LPS-Rec}$ is maintained. The primary changes made to $\proc{LPS-Rec}$ are as follows: 
+  \begin{enumerate}
+      \item The creation of a table, $M[1..n,1..n]$, with all entries set to $UNKNOWN$, to store the solutions to the subproblems that the recursive algorithm considers. This part of the algorithm has no effect on the recursive cases, so clearly the correctness is maintained.
+      \item We add a new base case to check if the value of a specific subproblem has already been computed. If the subproblem has been solved, we return the value, otherwise we enter the recursive cases as we do in $\proc{LPS-Rec}$. As a result, all of the subproblems are still being created and solved in the recursive cases which maintains the correctness of the algorithm.
+      \item In the recursive cases of lines 8 and 10, rather than directly returning the solutions to the subproblems, we store them in $M$ to be returned in line 5 if we come across the same subproblem again. This avoids the need to solve the same subproblem multiple times but does not change the actual work done in the recursive cases.
+      \item Finally, rather than returning the optimal solution to the original problem directly once the solutions to the subproblems are combined, we store it in $M$ and return it in line 11. This does not effect the correctness of the algorithm because it produces the same optimal solution as $\proc{LPS-Rec}$ but first stores the solution then returns it. 
+  \end{enumerate}
+  Thus, we conclude that $\proc{LPS-Rec}$ is correct and the changes we made in our memoized algorithm do not \emph{break} the correctness, so $\proc{LPS-Value}$ is correct as well.
+\end{proof}     
+%   We know that by the induction hypothesis the algorithm is correct for smaller subproblems and we see that the problem has an optimal substructure such that the optimal solutions to the subproblems can be combined to get the optimal solution to the original problem. Thus, upon reaching a base case, we add up the optimal solutions (maximum palindromic characters) to the subproblems to get the optimal solution to the original problem. Namely, the longest palindromic subsequence in the original string of length $n$. 
+%   \begin{proof}
+%   By induction on $n$, we show the correctness of $\proc{LPS-Value}$, by arguing that for any string $s$ of any length $n$, we can identify the longest palindromic subsequence contained in $s$.\\
+%   \\
+%   \ul{Base Cases ($(i>j)=(n=0)$) and ($(i=j)=(n=1)$):}\\
+%   \textbf{Case 1.} In the first base case, when $i>j$, we have an empty string of length 0. Clearly, an empty string cannot contain a palindromic subsequence so we return 0 as the length of of the longest palindromic subsequence.\\
+%   \textbf{Case 2.} In the second base case, when $i=j$, we have a string containing a single character. Since a single character is itself a palindrome, we return 1 as the length of the longest palindromic subsequence.\\
+%   \\
+%   \ul{Induction Step ($(i<j)=(n>1)$):}\\
+%   Induction Hypothesis: For all strings of length $n>1$, suppose $m<n$. We show if $\proc{LPS-Value}$ is correct for all smaller subproblems of some length $m$, it is correct for the original problem of length $n$ as well.\\
+% % Then utilizing the optimal substructure of the problem, we show that determining the solutions to smaller supproblems of length $m$ and combining the solutions to these subproblems, we get the optimal solution to the original problem, so the algorithms is correct for a string of length $n$ as well.\\
+%   \\
+%   When $n>1$ and we enter the recursive cases of lines 7-10, the length of the string is either decreased by 2 on line 7 or decreased by 1 on line 10 making the new length of the string some smaller size $m$. By the induction hypothesis we know that the algorithm is correct for strings of length $m$ as well. Therefore, when line 7 is satisfied, we have identified a solution to the current subproblem so we save the value of the current solution. Specifically, the solution we save is the value 2 for the two characters identified as a palindromic subsequence. If line 7 fails, line 10 is executed and makes a choice to decreases the size of the subproblem in two different ways and only keeps the maximum value produced by the two different subproblems. On each subsequent recursive call we further reduce the length of the string and solve the new, smaller subproblem until we reach a base case. %Once we reach a base case, we combine the solutions determined for %all of the subproblems by adding up the number of characters in the %palindromic subsequences identified in each subproblem and keeping %the optimal solution (the maximum value/length) of the longest palindromic subsequence.\\ 
+%   We know that by the induction hypothesis the algorithm is correct for smaller subproblems and we see that the problem has an optimal substructure such that the optimal solutions to the subproblems can be combined to get the optimal solution to the original problem. Thus, upon reaching a base case, we add up the optimal solutions (maximum palindromic characters) to the subproblems to get the optimal solution to the original problem. Namely, the longest palindromic subsequence in the original string of length $n$. 
+%   \end{proof}
+\item \textbf{Running Time.} %A statement of the running time of your
+  %algorithm and a formal argument that your algorithm runs in the
+  %stated time.\\
+  \begin{claim}
+  The running time of the algorithm is $T(n)=O(n^2)$.
+  \end{claim}
+  The running time of the algorithm can be determined by the size of our memoization table (total number of subproblems) times the cost associated with adding each entry to the table. Since our memoization table is of size $n \cdot n=n^2$, it requires $O(n^2)$ time to fill the entire table. For the second part, it takes $\Theta(1)$ time to add an entry to the table since our algorithm does not contain any loops so each line outside of the recursive calls executes in constant time. Since we use memoization, each subproblem is computed only once. In addition, the wrapper function takes $O(n^2)$ time to set the entries of $M$ to $UNKNOWN$, giving us the total running time,\\
+  \\
+  $T(n)=$ (\# entries in $M$) $\cdot$ (cost per entry) $+$ (work in wrapper function)\\
+  $T(n)=O(n^2) \cdot \Theta(1)+O(n^2)$\\
+  %\phantom{T(n) }$=O(n^2)+O(n^2)$\\
+  \phantom{T(n) }$=O(n^2)$.\\
+  \\
+  Thus, we conclude the algorithm has a worst-case running time of $T(n)=O(n^2)$. 
+\end{enumerate}  
+\section*{Self Reflection}
+Respond to the following prompts in the final draft of your solution:
+\begin{enumerate}
+% \item Is your solution correct? Explain briefly.\\
+\item I guess I technically do not know if my solution is correct since your solution uses a bottom-up algorithm and I opted for a strictly memoized algorithm. However, I will do my best to determine if my algorithm is correct base on the information I have. It looks like my recursive solution is very similar to the recursive solution you provided (I even named mine the same as yours!). Upon determining a recursive solution, I followed the four steps we discussed in class to covert a recursive algorithm to a memoized algorithm:
+\begin{enumerate}
+\item Make a wrapper function that initializes an empty table, $M$, to store computed values.
+\item Modify the original function to take $M$ as a parameter.
+\item Add a new base case to check if the value to the current subproblem has already been computed, if it is known, return the value.
+\item Add code to remeber the value calculated by the recursive calls.
+\end{enumerate}
+You can see in my soultion that I added a wrapper function to initialize the new table $M$, I added $M$ as a parameter to my main function, I added a new basecase in lines 5-6 to check if the value of the subproblem is known and return that value, and I added code on lines 8 and 10 to store/remember the solutions computed in the recursive calls. For these reasons I believe my algorithm is correct (Problem 1.2). If my algorithm is correct, I also believe my description of the algorithm (Problem 1.1) is more or less correct. Although as usual, It looks like my description of my algorithm is a bit "over the top." I attempted to describe every line of the algorithm with an explanation of what the line does, but again, probably more information than necessary. For my correctness argument (Problem 1.3), I honestly do not know. It seems right to me but I am afraid I did not fully understand Theorem 15.1, which I referenced in my argument, and as a result, I may not have applied it to my algorithm correctly. I understand my algorithm and think I understand why it is correct but I struggled to make a formal proof for it (more on this later). Was it wrong to reference Theorem 15.1? It is very similar to what my algorithm does and I understand it is not an exact match so I tried to use the logic of the theorem with adjustments for my specific algorithm but now I'm not sure if that was the best way to argue optimal substructure for my algorithm. Overall, I think my argument is on the right track but I am not sure how clearly I conveyed my own understanding to the reader. For the running time of the algorithm (Problem 1.4), I believe my solution is correct. I believe I correctly identified the number of entries in the table, the cost to add each entry to the table and the cost of the wrapper function resulting in the correct running time of $O(n^2)$. I am, however, curious about whether or not part of my argument is appropriate in a formal setting. I wrote out\\
+$T(n)=$ (\# entries in $M$) $\cdot$ (cost per entry) $+$ (work in wrapper function).\\
+Is this appropriate to do in a formal argument or should I only explain this in words and not include it in an equation? Sorry, I know this wasn't brief.
+% \item What did you do well and poorly? Explain briefly.\\
+\item I think I did a good job coming up with a recursive algorithm and converting it to a memoized algorithm. I also had a faily good understanding of the running time. I think I did a poor job arguing the correctness of the algorithm. I saw the similarities between Theorem 15.1 and my algorithm and think I spent too much time trying to make the Theorem apply to my algorithm rather than use a general understanding of the Theorem to argue the correctness of my algorithm. This is in addition to an overall weak, verbose induction proof. I feel pretty confident with loop invariants and recurrence proofs using substitution (both of which use induction) but this is the first "pure" induction proof I have ever argued and it certainly did not go as well as I would have liked. I am sure this is due in part to the fact that I did not take Math 197 or 199 but that is definitely not an excuse. It looks like I have some work to do.
+% \item What material did you struggle with? Explain briefly.\\
+\item My main struggle in this problem set was using induction to prove the correctness of my algorithm. As mentioned above, I have little experience arguing proof by induction outside of what we have covered in this class. Arguing the correctness proof was definitely outside of my comfort zone. This lead to my second struggle, being overly verbose in my arguments. I am always a bit wordy in my explanations but it is always the worst when I am not confident in what I am saying. In my mind I think if I add a ton of detail and over explain something, I will be able to get my point across. Unfortunately, I see this is not the case. This class is definitely helping me understand that over explaining does not help me make my point. In fact, it demonstrates that I do not fully understand what I am saying and, if anything, makes my argument more confusing. I have continued to struggle with this and although I have seen some improvement, it is still a major struggle. I hope as I get more confident with the material this will continue to improve. I also struggled understand Theorem 15.1, as mentioned above.   
+% \item What useful feedback did you incorporate from your groupmates?
+\item I received minor feedback on this problem set. Not counting the the feedback that says, "looks good" I got just two or three pieces of feed back that I could incorporate. One was that I left out a space between two words which I added. The second two were points about how I could clarify my argument by including a brief explanation of how I arrived at a certain point in my argument/algorithm which I included as well. Unfortunately, there was not much/any feedback on my correctness argument which I could have benefited from. I think part of the issue was due to the fact that my groupmate, who was assigned to give me feedback informed our group last minute that he was struggling with PS5 and was unable to provide me with good feedback. As a result, he asked our other group member to give me feedback in addition to the assigned feedback he already provided. I assume the time crunch and extra work for my second groupmate made the feedback less thorough than it otherwise would have been.
+% \item What useful feedback did you provide to your groupmates?
+\item The feedback I gave was primarily related to improving the overall structure of the problem set and clarifying arguments that were a bit confusing. Specifically, I gave feedback to help improve the informal description of the algorithm related to what the base cases do and what the overall goal of the algorithm is. In part 1.2, I mentioned what I thought was a missing return statement in the algorithm but I am not sure if my feedback was correct (which I made clear to my groupmate) since my algorithm was different. The issue was that in the base cases, 0 and 1, the algorithm stored the value 0 or 1 in the memoization table rather than returning it. I thought this might be wrong because you reached the base case but since you don't return, you would actually reenter the recursive cases again which I didn't thik you should. Part 1.3. The correctness proof did not mention optimal substructure directly. It kind of referenced the idea behind optimal substructure but I thought it might help to make the connection explicit. I also gave some feedback regarding ways to make the argument more technical. The argument contained a lot of general descriptions like "the first character in the string" without ever really identifying the character in terms of $s[i]$, for example. This is something I have struggled with as well. Part 1.4. was pretty good so I had little feedback.   
+% \item What elements of writing are you going to focus on improving in future problem sets?
+\item I will definitely be focusing on making my writing more concise. I went through for the final draft and was able to remove a few places where I essentially repeated the same thing multiple times (There is definitely more that could/should have been removed). As I mentioned above, I think I do this even more than usual when I feel less confident with the material. I really struggled to make a concise proof by induction for the correctness. That being said, I plan to continue focusing on making my writing more technical and concise but I am also going to review proofs by induction in the Discrete Mathematics textbook to hopefully gain a better understanding.  
+\end{enumerate}
+  
+\end{document}

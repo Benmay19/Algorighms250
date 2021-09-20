@@ -1,0 +1,172 @@
+\documentclass[11pt]{article} 
+
+% ------- List of packages to import ------------
+\usepackage{fullpage}
+\usepackage{soul}
+\usepackage{url}
+\usepackage{pgf}
+\usepackage{tikz}
+\usepackage{enumitem}
+\usetikzlibrary{arrows,automata}
+\usepackage[latin1]{inputenc}
+\usepackage{clrscode3e} % Documentation here http://www.cs.dartmouth.edu/~thc/clrscode/clrscode3e.pdf
+\usepackage{amssymb}
+\usepackage{amsmath}
+\RequirePackage[amsmath,hyperref,thmmarks]{ntheorem}
+\usepackage{hyperref} % This always has to be the LAST package.  
+
+\theoremseparator{.}
+
+% ------- Theorem and related environments --------
+\newtheorem{theorem}{Theorem}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition} 
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem{observation}[theorem]{Observation}
+\newtheorem{fact}[theorem]{Fact}
+
+% ------- Commands specifying theorem style -------
+
+\theoremstyle{nonumberplain}
+\theoremheaderfont{\normalfont\itshape}
+\theorembodyfont{\normalfont}
+\theoremsymbol{\ensuremath{_\blacksquare}}
+\newtheorem{proof}{Proof}
+
+% ------- Useful math macros -----------
+\newcommand{\NN}{\mathcal{N}} % Natural Numbers
+\newcommand{\RR}{\mathcal{R}} % Real Numbers
+\newcommand{\ZZ}{\mathcal{Z}} % Integers
+\newcommand{\QQ}{\mathcal{Q}} % Rational Numbers
+
+\newcommand{\set}[1]{\ensuremath{\{{#1}\}}} % Set
+\newcommand{\bigset}[1]{\ensuremath{\left\{{#1}\right\}}}
+\newcommand{\condset}[2]{\ensuremath{\set{{#1}\;|\;{#2}}}} % Conditional set
+\newcommand{\nin}{\not\in}
+\newcommand{\cross}{\times} % Cartesian product
+\newcommand{\ssn}{\subsetneq} % Proper subset
+\newcommand{\sse}{\subseteq} % Subset
+
+
+
+
+\begin{document}
+
+%% ^^^^^^^^^ Don't change anything above this line ^^^^^^^^^^^^^^^^
+
+
+
+\begin{center}
+
+{\LARGE
+\textsc{CSC 250 -- Algorithms -- Problem Set 4}
+\bigskip}
+
+\bigskip
+{\Large
+%\textsc{Solution}
+}
+
+
+\end{center}
+
+
+% This problem set has only one problem because of your exam this week.
+
+\section*{Problem 1}
+
+% Complete Problem 4-5 from the textbook.   (Hint: Make a divide and conquer algorithm.)
+\begin{enumerate}
+\item[a.] In the case where at least $n/2$ chips are bad, the number of bad chips is $a \geq \left \lceil{n/2} \right \rceil$ and the number remaining chips, $b=n-a$, are good. Therefore, there are always at least as many bad chips as good chips, $a \geq b$. %The fact that there are more bad chips than good chips is important because in any given pairwise test, it is likely that at least one of the chips is bad making the results of that test untrustworthy. 
+Since the bad chips can conspire to fool the professor, the best strategy for the bad chips is to report results that make themselves indistinguishable from the good chips. To accomplish this, bad chips will always report that other bad chips are \emph{good} and report that good chips are \emph{bad}. Therefore, the results reported by the bad chips mirror the results reported by the good chips such that when two bad chips are tested they both report good, when two good chips are tested they both report good, and when one bad chip and one good chip (or visa-versa)  are tested one always reports good and one always reports bad. Thus, with the bad chips using this strategy, the professor cannot necessarily determine which chips are good and which chips are bad.
+
+\item[b.] Assuming that more than $n/2$ chips are good and using the same notation as part a., we have the number of good chips is $b>n/2$ and the number of bad chips is $a=n-b$. We show that $\left \lfloor{n/2} \right \rfloor$ pairwise tests are sufficient to reduce the problem to one of nearly half the size, and eventually identify a good chip, by constructing a divide and conquer algorithm where $A$ is an array of length $n$ containing all $n$ of the chips to be tested. \\
+\\
+\proc{Get-Good-Chip}($A$)
+\begin{itemize}
+    \item[1.] Iterate through the array and conduct pairwise tests on adjacent elements for each pair of two untested chips. \\
+    \\
+    // If one element remains due to the number of chips being odd, leave it untested until a later recursive call (this maintains the assertion that $\left \lfloor{n/2} \right \rfloor$ pairwise tests are sufficient to reduce the problem to one of nearly half the size due to the floor). Even ignoring the odd chip we will maintain more good chips than bad because either the odd chip is good and we will keep it for the next level of recursion, or the odd chip is bad which means there are more good chips than bad chips being tested which will result in maintaining more good chips after the tests. \\
+    \begin{itemize}
+        \item[2.] If both chips report that the other is \emph{good}, keep one and remove one because either way you reduce the array by one but maintain the property that there are more good chips than bad chips.
+        \item[3.] Else, if at least one chip is \emph{bad}, remove both chips from the array. Again, since this removes either one good chip and one bad chip or two bad chips, the number of good chips is still greater than the number of bad chips bad chips. \\
+    \end{itemize}
+    // After this first round of tests, we have completed $\left \lfloor{n/2} \right \rfloor$ pairwise tests and the number of chips in the array, $A'$, has been reduced to half or less than half the size of the original array $A$. \\
+    \item[4.] Prior to recursing over the newly reduced array we must first check for a base case from among the chips tested (ignoring the last chip if the number of chips was odd).
+    \begin{itemize}
+        \item[5.] If only 1 chip remains after testing when $n$ was even, we have our \emph{good} chip. Return that chip. 
+        \item[6.] Else, if $n$ was odd and we have 0 of the tested chips remaining, the single, untested chip is \emph{good}. Return that chip.\\
+    \end{itemize}    
+    // We know this is a good chip because we started with more good chips than bad chips and after each test, the ratio of good chips to bad chips was either maintained or the ratio of good chips was increased (in the case where you get rid of two bad chips). Thus, when we get down to a single chip, the chip must be \emph{good}. \\
+    % // When two chips remain from among the chips tested, we still recurse over these chips because there are two possible cases that will both be addressed in the next recursive call.
+    % \begin{itemize}
+    %     \item \textbf{Case 1.} There was an even number of chips so these are the last two chips and should both be \emph{good}. Thus, the chips will be tested in the next recursion leaving us with one good chip. 
+    %     \item \textbf{Case 2.} There was an odd number of chips, leaving us with a third, untested, chip. On the next recursion the number of chips will still be odd so only the first two chips will be tested leaving us with one of two results. Either both chips are good and we are left with a single good chip which we will return or one of the chips is bad so we remove both chips and the odd, untested chip is our good chip. Return that chip. \\ 
+    % \end{itemize}
+    \item[7.] Recursively call the procedure on the newly reduced array $A'$, \proc{Get-Good-Chip}($A'$).
+\end{itemize}
+From the above algorithm, we conclude that at each level of the recursion we reduce the number of chips to nearly half the size in $\left \lfloor{n/2} \right \rfloor$ pairwise tests.
+\item[c.] 
+\begin{claim}
+When $n/2$ chips are good, we can identify a good chip in $\Theta(n)$ pairwise tests. 
+\end{claim}
+In the worst-case each level of recursion performs $\left \lfloor{n/2} \right \rfloor$ pairwise tests and reduces the number of chips to at most $\left \lceil{n/2} \right \rceil$. Therefore, the running time of the algorithm can be written as the recurrence, \\
+\\
+$T(n)=T(n/2)+n/2$
+\begin{proof}
+By strong induction on $n$, we show that $T(n) \le b \cdot n$ is the solution to the recurrence using substitution. \\
+\\
+\ul{Base Case ($n=1$):} \\
+$T(1)=1=c$\\
+$T(1)=b \cdot 1$\\
+\phantom{T(1) }$=b$\\
+\\
+Since $b \geq c$, we conclude that the base case holds for all $b \geq 1$.\\
+\\
+\ul{Induction Step ($n>1$):}\\
+Induction Hypothesis: For all integers $n>1$ suppose $m<n$. We show if $T(m) \le b \cdot m$ is true, then $T(n) \le b \cdot n$ is also true.\\
+\\
+$T(n)=T(n/2)+c(n/2)$\\
+\\
+By the Induction Hypothesis we substitute in $T(m)$ where $m=n/2$.\\
+\\
+\phantom{T(n) }$\le b(n/2)+c(n/2)$\\
+\\
+Since $b$ can be any constant we substitute in the value $b=c$\\
+\\
+\phantom{T(n) }$=c(n/2)+c(n/2)$\\
+\phantom{T(n) }$=c \cdot n$\\
+\\
+Substituting our constant $b$ back into the equation, we get\\
+\\
+\phantom{T(n) }$=b \cdot n$\\
+\\
+Thus, $T(n) \le b \cdot n$ holds for finding a single good chip in $\Theta(n)$ time. We can then test the good chip with each of the $n-1$ remaining chips to find all good chips in $\Theta(n)$ pairwise tests.
+\end{proof}
+\end{enumerate}
+\section*{Self Reflection}
+
+% Respond to the following prompts in the final draft of your solution:
+
+\begin{enumerate}
+% \item Is your solution correct?  Explain briefly.
+\item I believe all of my solutions would be considered correct albeit different from your solutions in a few places. 1.a. This one was pretty close to you solution. I determined that if the bad chips mirror the behavior of the good chips (e.g., bad chips report bad chips are good and report good chips are bad) it will make the results impossible to distinguish good from bad. I believe this was the main argument for part a. 1.b. Again, similar to your solution but mine was definitely not as technical. I did not label the chips or declare variables ($c_1,...,c_n$, $h$, $k$, etc.) then use the variables to make my argument more explicit. I used more generic terms like, "the odd chip" or "remove one of the chips". I know this is not as technical but I believe it still holds. I also failed to provide all possible cases for when $n$ is odd but I think my solution still holds and the algorithm accounts for the odd chip and will still reduce the number of chips to half the size in $\left \lfloor{n/2} \right \rfloor$ pairwise tests and terminate with a single good chip. I believe this is true because of the fact that when both chips report good, I throw out one and when at least one chip reports bad, I throw out both. I could be wrong about this. 1.c. I identified the correct recurrence but did not add the floor of n/2 to the local work. I actually considered using the floor but thought we could leave it out of the recurrence because it won't significantly change the results. I also opted to solve the recurrence via substitution which in hindsight was definitely not the best option as the master method is much more efficient but I believe my solution is still correct.      
+% \item What did you do well and poorly?  Explain briefly.
+\item I think I did well identifying some of the main argument in each question (1.a. bad chips mirroring good chips, 1.b. removing the correct number of chips depending on the test results, 1.c. more or less the correct recurrence). I also felt pretty confident solving the recurrence via substitution even though it was not the best way to solve it. I did poor job giving a highly technical solution for part b. It would not have been too difficult to do this and I think it would have improved my algorithm and the overall ease of understanding. Providing a solution with the appropriate amount of detail and explanation is something I have continued to struggle with.  
+% \item What material did you struggle with?  Explain briefly.
+\item As mentioned in the previous question, I struggled to identify the appropriate amount of technical detail to include in part b. I think this goes back to one of my struggles I mentioned in a previous problem set. Namely, identifying the level of detail required to adequately solve a specific problem. In the past I have included significantly more technical information than necessary (cost and number of execution tables, reproving running time and correctness after only making a few minor changes to an algorithm that was already analyzed, etc.) and now I am not including enough. This is something I will continue to work on and hopefully find the "sweet spot." I also struggled using the master method. I actually attempted it before using substitution and it turns out I made a silly mistake. I got $n^{log_ba}=n^0=1$ and determined it was case 3 but got $\epsilon$ and $c$ confused in my head. I was thinking $\epsilon<1$ and $c>0$ (which is reversed) so obviously I couldn't find a value of $\epsilon$ that worked. This was just silly and I am embarrassed even mentioning it here, but I will be sure not to mix this up again. 
+% \item What useful feedback did you incorporate from your groupmates?
+\item I had little feedback on this problem set (about one bullet point for each part) but there were a few suggestions I was able to incorporate. I removed a couple unnecessary sentences that did not contribute to my actual argument and, as a result, made the explanation more confusing. I was also informed that I could have used the master theorem in part c which I did not implement at this stage since it significantly changes my work in the solution of part c. I also got some feedback on part b about my algorithm not needing to find a single good chip and only needing to show that the number of chips was reduced to nearly half. I also did not implement this feedback because it would drastically change my original algorithm. Moreover, I don't necessarily think that explaining the end result of the algorithm (i.e., finding a single good chip) makes the solution incorrect since I also covered the question of reducing the chips to nearly half in $\left \lfloor{n/2} \right \rfloor$ pairwise tests. Although, this may be another situation of me providing too much unnecessary information. 
+% \item What useful feedback did you provide to your groupmates?
+\item I provided mostly grammatical, ease of understanding, and overall structure feed back but also provided some \LaTeX{} help. There were several spots where my groupmate used "is" instead of "are." In addition, some of the sentences were a bit "clunky" and difficult to understand so I provided feedback on how to say essentially the same thing but in a way that makes more sense. Also, every time my groupmate used floor or ceiling they just put $[n/2]$, I provided them with the \LaTeX{} code to write $\left \lceil{n/2} \right \rceil$ and $\left \lfloor{n/2} \right \rfloor$, as well as a few additional minor \LaTeX{} tips. I also gave some feedback regarding correctness, which I typically do sparingly since we aren't supposed to be making significant changes that change our actual solution. The feedback I gave was to specifically mention the recursion in part b. The solution generally explained recursion (do these tests, then do the tests again on the remaining chips) but I thought mentioning recursion/recursive cases would make a more formal divide and conquer algorithm without changing what he was actually saying. Is this kind of feedback okay?    
+% \item What elements of writing are you going to focus on improving in future problem sets?
+\item In future problem sets I am really going to focus on identifying the best way to make a technical argument/solution that fully answers the question without adding additional, unnecessary information. I think asking myself questions like, "What is this problem asking for?", "What \emph{must} be included in the solution?", "Has part of the solution been covered previously or in a different part of the problem?", "What variables can I declare to streamline my solution and make it more concise?", etc. Any additional suggestions about good questions to ask myself when planning out my solution are welcome. I will also work on being more careful in my analysis. I definitely should have caught the issue I was having with the master theorem, but instead of spending a few extra minutes to figure out what was wrong, I just went straight into "Plan B" (substitution) even though it wasn't the best option.   
+\end{enumerate}
+
+
+
+\end{document}

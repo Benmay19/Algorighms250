@@ -1,0 +1,279 @@
+\documentclass[11pt]{article} 
+
+% ------- List of packages to import ------------
+\usepackage{fullpage}
+\usepackage{soul}
+\usepackage{url}
+\usepackage{pgf}
+\usepackage{tikz}
+\usetikzlibrary{arrows,automata}
+\usepackage[latin1]{inputenc}
+\usepackage{clrscode3e} % Documentation here http://www.cs.dartmouth.edu/~thc/clrscode/clrscode3e.pdf
+\usepackage{amssymb}
+\usepackage{amsmath}
+\RequirePackage[amsmath,hyperref,thmmarks]{ntheorem}
+\usepackage{hyperref} % This always has to be the LAST package.  
+
+\theoremseparator{.}
+
+% ------- Theorem and related environments --------
+\newtheorem{theorem}{Theorem}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition} 
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem{observation}[theorem]{Observation}
+\newtheorem{fact}[theorem]{Fact}
+
+% ------- Commands specifying theorem style -------
+
+\theoremstyle{nonumberplain}
+\theoremheaderfont{\normalfont\itshape}
+\theorembodyfont{\normalfont}
+\theoremsymbol{\ensuremath{_\blacksquare}}
+\newtheorem{proof}{Proof}
+
+% ------- Useful math macros -----------
+\newcommand{\NN}{\mathcal{N}} % Natural Numbers
+\newcommand{\RR}{\mathcal{R}} % Real Numbers
+\newcommand{\ZZ}{\mathcal{Z}} % Integers
+\newcommand{\QQ}{\mathcal{Q}} % Rational Numbers
+
+\newcommand{\set}[1]{\ensuremath{\{{#1}\}}} % Set
+\newcommand{\bigset}[1]{\ensuremath{\left\{{#1}\right\}}}
+\newcommand{\condset}[2]{\ensuremath{\set{{#1}\;|\;{#2}}}} % Conditional set
+\newcommand{\nin}{\not\in}
+\newcommand{\cross}{\times} % Cartesian product
+\newcommand{\ssn}{\subsetneq} % Proper subset
+\newcommand{\sse}{\subseteq} % Subset
+
+
+
+
+\begin{document}
+
+%% ^^^^^^^^^ Don't change anything above this line ^^^^^^^^^^^^^^^^
+
+
+
+\begin{center}
+
+{\LARGE
+\textsc{CSC 250 -- Algorithms -- Problem Set 3}
+\bigskip}
+
+\end{center}
+
+\section*{Problem 1}
+
+% The analysis of \proc{Randomized-Quicksort} from class and in the text
+% assumes that all the element values are distinct.  In this problem you
+% will examine the situation when they are not.  
+
+\begin{enumerate}
+% \item Suppose that all element values of the input array are equal.
+%   What would the running time of \proc{Randomized-Quicksort} be in this case?
+\item \begin{claim}
+When all values in the input array are equal, the running time of \proc{Randomized-Quicksort} is $T(n)=\Theta(n^2)$.
+\end{claim}  
+Since the value of any random pivot selection is equal to the value of all other elements in the array, each pivot selection will produce two subproblems of size 0 and $n-1$ reducing the size of each subarray by one on each recursive call. The recurrence for Randomized-Quicksort is $T(r-p+1)=\Theta(1)+\Theta(r-p+1)+T((q-1)-p+1)+T(r-(q+1)+1)$ or, more simply, making $r-p+1$ equal $n$ we get, $T(n)=\Theta(n)+T(n-m)+T(m)$ where $m$ is the number of elements to the right of the pivot, $n-m$ is the number of elements to the left of the pivot, and $\Theta(n)$ is the work done by \proc{Partition} on an array of size $n$. When all values are equal, every level of recursion yields $m=0$ and $n-m=n-1$ since the pivot is not included. As Matt explained in lecture, we can solve the recurrence, as follows. \\
+\\
+$T(n)=\Theta(n)+T(n-m)+T(m)$ \\
+\\
+Plugging in the values of $n-m=n-1$ and $m=0$ we get, \\
+\\
+$T(n)=\Theta(n)+T(n-1)+T(0)$ \\
+\\
+\phantom{T(n) }$=\Theta(n)+T(n-1)$ \\
+\\
+\phantom{T(n) }$=c \cdot n+T(n-1)=c \cdot n+c(n-1)+T(n-2)$ \\
+\\
+\phantom{T(n) }$=c \cdot n+c(n-1)+c(n-2)+...+c \cdot 2+c \cdot 1$ \\
+\\
+Applying the summation of an arithmetic series yields, \\
+\\
+\phantom{T(n) }$=c \cdot \sum\limits_{i=1}^{n}i=c \cdot \left(\frac{n(n+1)}{2}\right)$ \\
+\\
+Thus, the running time of \proc{Randomized-Quicksort} when all input values are equal is $T(n)=\Theta(n^2)$.
+% \item The \proc{Partition} procedure returns an index $q$ such that
+%   each element of $A[p..(q-1)]$ is less than or equal to $A[q]$ and
+%   each element of $A[(q+1)..r]$ is greater than $A[q]$.  Modify the
+%   \proc{Partition} procedure into a procedure
+%   \proc{Partition'}$(A,p,r)$, which permutes the elements of $A[p..r]$
+%   and returns two indices $q$ and $t$, where $p \le q \le t \le r$,
+%   such that
+%   \begin{itemize}
+%   \item all elements of $A[q..t]$ are equal,
+%   \item each element of $A[p..(q-1)]$ is less than $A[q]$, and
+%   \item each element of $A[(t+1)..r]$ is greater than $A[q]$.
+%   \end{itemize}
+%   Please format your algorithms using the \texttt{codebox} environment
+%   as \proc{Bubblesort} is in Problem Set 1.  (Hint: The more complex
+%   you make your algorithm the more difficult it will be to prove
+%   correct -- try to keep it simple!) \\
+\item We modify the \proc{Partition} procedure into a procedure \proc{Partition'}$(A,p,r)$.
+\begin{codebox}
+\Procname{$\proc{Partition'}(A,p,r)$}
+\li $x=A[r]$
+\li $i=p-1$
+\li $j=p-1$
+\li \For $k \gets p$ \To $r-1$ \Do
+\li     \If $A[k]==x$ \Do
+\li         $j=j+1$
+\li         exchange $A[j]$ with $A[k]$
+\li     \Else \If $A[k]<x$
+\li         $i=i+1$
+\li         $j=j+1$
+\li         exchange $A[j]$ with $A[k]$
+\li         exchange $A[i]$ with $A[j]$
+        \End
+    \End
+\li exchange $A[j+1]$ with $A[r]$
+\li \Return $i+1$, $j+1$
+\end{codebox}  
+% \item Prove that your algorithm is correct, i.e., argue that
+%   \proc{Partition'} behaves in the way specified above.  State and
+%   prove any loop invariants you require. \\
+\item The loop invariant is:
+\begin{claim}
+ At the beginning of each iteration of the \For loop of lines 4--12, for any array index l, we state these properties:
+ \begin{enumerate}
+     \item[1.] If $p \le l \le i$, then $A[l]<x$
+     \item[2.] If $i+1 \le l \le j$, then $A[l]=x$
+     \item[3.] If $j+1 \le l \le k-1$, then $A[l]>x$.
+ \end{enumerate}
+\end{claim}
+\begin{proof}
+ We prove the loop invariant holds by arguing the three properties.
+ \begin{enumerate}
+     \item \textsc{Initialization}. In the base case $i=j=p-1$ and $k=p$. Prior to the first iteration of the loop, $A[p..i]$, $A[(i+1)..j]$, and $A[(j+1)..(k-1)]$ are empty subarrays, therefore, all three conditions of the loop invariant are trivially satisfied.
+     \item \textsc{Maintenance}. We must consider three cases depending on the outcome of the conditions on lines 5 and 8. \\
+     \begin{enumerate}
+         \item $A[k]=x$. In this case, the condition on line 5 is satisfied so $j$ is incremented, $A[j]$ is swapped with $A[k]$, then $k$ is incremented prior to the next iteration and $i$ remains unchanged. By the loop invariant, we see that as a result of the swap, we now have $A[j]=x$ since all elements from $A[(i+1..j]$ are equal to $x$ and $i$ is unchanged so properties 1 and 2 of the loop invariant hold. Once $k$ is incremented, the loop invariant indicates that $A[(j+1)..(k-1)]$ contains all of the original elements prior to entering the loop so property 3 of the loop invariant is re-established. 
+        \item $A[k]<x$. In this case, the condition on line 8 is satisfied so both $i$ and $j$ are incremented, $A[j]$ is swapped with $A[k]$, $A[i]$ is swapped with $A[j]$ then $k$ is incremented. The result of incrementing $j$, the first swap, and incrementing $k$ upholds property 3 because $A[(j+1)..(k-1)]$ contains all of the original elements prior to entering the loop. In addition, after incrementing $i$ and $j$ and executing both swaps, by the loop invariant we now have that $A[i]<x$ which satisfies property 1 and $A[(i+1)..j]$ contains all the original elements prior to the execution of the loop so property 3 is maintained. Thus, for all three cases, the loop invariant holds.  
+        \item $A[k]>x$. In this case, neither of the conditions on lines 5 or 8 are satisfied so the only action in the loop is that $k$ is incremented. Thus, when $k$ is incremented, property 3 of the loop invariant holds for $A[k-1]>x$ and $i$ and $j$ are unchanged so properties 1 and 2 are maintained as well. 
+        \end{enumerate} 
+     \item \textsc{Termination}. At termination, $k=r$. Therefore, every element in $A[p..(r-1)]$ has been looked at and is a member of one of the three properties defined by the loop invariant. Moreover, each element has been partitioned into one of three groups: the left partition, $A[p..i]$, contains the elements with a value less than $x$, the middle partition, $A[(i+1)..j]$, contains the elements with a value equal to $x$, and the right partition, $A[(j+1)..(r-1)]$, contains the elements with a value greater than $x$.    
+ \end{enumerate}
+\end{proof}
+ 
+% \item Your algorithm \proc{Partition'} should take $\Theta(r-p)$ time
+%   just like \proc{Partition}, argue that this is the case. \\
+\item We argue the running time of \proc{Partition'}:
+\begin{claim}
+  The running time of \proc{Partition'} is $\Theta(r-p)=\Theta(n)$.
+\end{claim}  
+\begin{codebox}
+\Procname{$\proc{Partition'}(A,p,r)$}
+\li $x=A[r]$
+\li $i=p-1$
+\li $j=p-1$
+\li \For $k \gets p$ \To $r-1$ \Do
+\li     \If $A[k]==x$ \Do
+\li         $j=j+1$
+\li         exchange $A[j]$ with $A[k]$
+\li     \Else \If $A[k]<x$
+\li         $i=i+1$
+\li         $j=j+1$
+\li         exchange $A[j]$ with $A[k]$
+\li         exchange $A[i]$ with $A[j]$
+        \End
+    \End
+\li exchange $A[j+1]$ with $A[r]$
+\li \Return $i+1$, $j+1$
+\end{codebox} 
+We start our argument by identifying the cost, $c_i$, and the number of executions for each line of the \proc{Partition'} algorithm. \\
+\\
+  \begin{tabular}{ @{\hskip0pt}l l l }
+  Line & Cost & Times \\
+  1 & $c_1$ & 1 \\
+  2 & $c_2$ & 1 \\
+  3 & $c_3$ & 1 \\
+  4 & $c_4$ & $r-p+1$ \\
+  5 & $c_5$ & $r-p$ \\
+  6 & $c_6$ & $\le r-p$ \\
+  7 & $c_7$ & $\le r-p$ \\
+  8 & $c_8$ & $\le r-p$ \\
+  9 & $c_9$ & $\le r-p$ \\
+  10 & $c_{10}$ & $\le r-p$ \\
+  11 & $c_{11}$ & $\le r-p$ \\
+  12 & $c_{12}$ & $\le r-p$ \\
+  13 & $c_{13}$ & 1 \\
+  14 & $c_{14}$ & 1
+  \end{tabular}\\
+  \\
+  We now show the running time of \proc{Partition'} by adding up the the total cost of each line executed where $A.length=r-p+1=n$. \\
+  \\
+  $T(n)=c_1+c_2+c_3+c_4(n)+c_5(n-1)+c_6(n-1)+c_7(n-1)+c_8(n-1)+c_9(n-1)+$\\ \phantom{T(n) =} $c_{10}(n-1)+c_{11}(n-1)+c_{12}(n-1)+c_{13}+c_{14}$ \\
+  \\
+  Expanding the expression and reordering the terms we get, \\
+  \\
+  $T(n)=c_4(n)+c_5(n)+c_6(n)+c_7(n)+c_8(n)+c_9(n)+c_{10}(n)+c_{11}(n)+c_{12}(n)+c_1+c_2+$ \\ \phantom{T(n) =} $c_3-c_5-c_6-c_7-c_8-c_9-c_{10}-c_{11}-c_{12}+c_{13}+c_{14}$\\
+  \\
+  Factoring out an $n$ yields, \\
+  \\
+  $T(n)=(c_4+c_5+c_6+c_7+c_8+c_9+c_{10}+c_{11}+c_{12})n+(c_1+c_2+$ \\ \phantom{T(n) =} $c_3-c_5-c_6-c_7-c_8-c_9-c_{10}-c_{11}-c_{12}+c_{13}+c_{14})$ \\
+  \\
+  We can express the worst-case running time as $an+b$ for constants $a,b$ that depend on the statement costs $c_i$. We conclude that in both the best-case and worst-case, we see that the running time is dominated by the \For loop of line 4 so we conclude the running time is linear since regardless of the input, each statement in the body of the loop will execute some constant number of times less than $n$. Thus, $T(n)=\Theta(n)=\Theta(r-p+1)$ and dropping the constant term gives us $\Theta(p-r)$ for the running time of \proc{Partition'}.
+% \item Modify \proc{Randomized-Partition} to call \proc{Partition'}
+%   instead, and name a new procedure \proc{Randomized-Partition'}.
+%   Modify \proc{Randomized-Quicksort} into a procedure
+%   \proc{Randomized-Quicksort'} that calls \proc{Randomized-Partition'}
+%   and recurses only on partitions of elements not known to be equal to
+%   each other.  Explain why your modifications are correct -- you do
+%   not need to give a full proof. \\
+\item We modify \proc{Randomized-Quicksort} and \proc{Randomized-Partition} such that \proc{Randomized-Quicksort'} recurses only on partitions of elements not known to be equal to
+each other.
+\begin{codebox}
+\Procname{$\proc{Randomized-Partition'}(A,p,r)$}
+\li $i=\proc{Random}(p,r)$
+\li exchange $A[r]$ with $A[i]$
+\li \Return $\proc{Partition'}(A,p,r)$
+\end{codebox}  
+\begin{codebox}
+\Procname{$\proc{Randomized-Quicksort'}(A,p,r)$}
+\li \If $p<r$ \Do
+\li     $q,t=\proc{Randomized-Partition'}(A,p,r)$
+\li     $\proc{Randomized-Quicksort'}(A,p,q-1)$
+\li     $\proc{Randomized-Quicksort'}(A,t+1,r)$
+    \End
+\end{codebox}
+We show the our modifications to \proc{Randomized-Quicksort'} are correct as follows. \\
+%by identifying the modifications made to the new procedures, \proc{Randomized-Partition'} and \proc{Randomized-Quicksort'}, and by discussing the implications of these modifications. \\
+\\
+% The first general modification made was to change all of the procedure names to reflect the new procedure names designated in the directions. Specifically, each occurrence of \proc{Randomized-Quicksort}, \proc{Randomized-Partition}, and \proc{Partition} is changed to \proc{Randomized-Quicksort'}, \proc{Randomized-Partition'}, and \proc{Partition'}, respectively. This is correct because the new procedure names must be called to access our modified algorithm. \\
+% \\
+The original \proc{Partition} procedure only returned a single value, the correct index of the pivot element, which is assigned to the variable $q$ on line 2 of \proc{Randomized-Quicksort}. Since our modified \proc{Partition'} procedure returns two values, we modified line 2 of \proc{Randomized-Quicksort'} to include two variable assignments, $q$ and $t$, one for each return value. \\
+\\
+Finally, we modified lines 3 and 4 of \proc{Randomized-Quicksort'} to ensure the new procedure only recurses on partitions of elements not known to be equal to each other. This is accomplished by modifying the procedure arguments on lines 3 and 4 to \proc{Randomized-Quicksort'}$(A,p,q-1)$ and \proc{Randomized-Quicksort'}$(A,t+1,r)$, respectively. Since $p \le q \le t \le r$ and the value of all elements in $A[q..t]$ are equal, the partition of elements in $A[p..(q-1)]$ and $A[(t+1)..r]$ are not known to be equal. This is true because we only check if the value of a given element is equal to the value of the pivot, and once a given value is assigned as the pivot, all other elements with that value are partitioned away from the remaining elements and are not included in any subsequent recursive calls. Thus, only partitions of elements not known to be equal can be passed as arguments to \proc{Randomized-Quicksort'} in lines 3 and 4 ensuring the correctness the algorithm. \\
+
+% \proc{Randomized-Partition'} is only different from \proc{Randomized-Partition} in that is calls \proc{Partition'}, which we created and proved above, instead of \proc{Partition}. This is what the question directions require, thus, this modification is correct. \\
+% \\
+% \proc{Randomized-Quicksort'} is different from \proc{Randomized-Quicksort} in four primary ways. First, per the question directions, \proc{Randomized-Quicksort'} calls \proc{Randomized-Partition'}, instead of \proc{Randomized-Partition}, which we modified above. Second, the original \proc{Randomized-Quicksort} calls \proc{Randomized-Partition} which calls \proc{Partition}. \proc{Partition} returns a single value, the index of the pivot, which is assigned to a single variable $q$ in \proc{Randomized-Quicksort}. \proc{Randomized-Quicksort'}, on the other hand, calls \proc{Randomized-Partition'} which calls \proc{Partition'}. \proc{Partition'} returns two values, $q$ and $t$, such that all elements of $A[q..t]$ are equal, each element of $A[p..(q-1)]$ is less than $A[q]$, and each element $A[(t+1)..r]$ is greater than $A[q]$. Therefore, we modified the single variable assignment, $q$, in \proc{Randomized-Quicksort} to a double variable assignment, $q,t$, in \proc{Randomized-Quicksort'} so both return values are assigned to a unique variable. Finally, both recursive calls of lines 3 and 4 are modified to call \proc{Randomized-Quicksort'} instead of \proc{Randomized-Quicksort}. In addition, the arguments passed to the recursive calls are modified to recurse only on partitions of elements not known to be equal to each other. This is accomplished on lines 3 and 4 by modifying the arguments to $(A,p,q-1)$ and $(A,t+1,r)$, respectively. Since $p \le q \le t \le r$ and $A[q..t]$ are equal, the partition of elements in $A[p..q-1]$ and $A[t+1..r]$ are not known to be equal. This is true because we only check if the value of a given element is equal to the value of the pivot and once a given value is assigned as the pivot, all other elements with that value are partitioned and removed from any future recursive calls. Thus, only partitions of elements not known to be equal can be passed as arguments in lines 3 and 4.    
+\end{enumerate}
+
+\section*{Self Reflection}
+% Respond to the following prompts in the final draft of your solution:.
+
+\begin{enumerate}
+% \item Is your solution correct?  Explain briefly. \\
+\item I believe that all of my solutions are correct for the most part, despite being slightly different than yours and in some cases, giving significantly more information than necessary. For this revision I did go through and cut out some of the excess and could have cut out a lot more but I thought it would not be an accurate representation for my original work. 1.1 I did more mathematical analysis than necessary which, honestly, may have made my solution more complicated/confusing than necessary but I believe it still correctly answers the question. 1.2 My solution is very similar to your version 2 solution with minor differences in when variables are incremented, etc. but I am pretty sure my solution produced the correct output. 1.3 My proof of correctness is also similar to yours for version 2 although my explanation is not nearly as succinct as yours. Also, in my first draft, I oftentimes forgot to refer back to the LI to verify my claims. I made these adjustments in some places on my final draft. 1.4 I clearly did way too much for this solution but I believe it still correctly proves the running time of \proc{Partition'} (see what I struggled with). 1.5 Again, I believe the solution is correct but is significantly more verbose than your solution (see struggles).  
+% \item What did you do well and poorly?  Explain briefly.
+\item I think I did well identifying the algorithm for \proc{Partition'} since it is very similar to your version 2 algorithm and it didn't take me much time to come up with my solution. I also felt a lot more confident arguing the three properties of my loop invariant. I am definitely starting to gain a better understanding of that style of proof. I did a poor job being clear and concise in my solutions. I also did poorly when it came to identifying arguments that can be made simply by referencing the original algorithm. It does make a bit more sense now that if you write a modified algorithm with only a few changes to the original, you can safely assume the original still holds as long as you explain the correctness of the minor changes made. Is that (more or less) correct?  
+% \item What material did you struggle with?  Explain briefly. 
+\item Unfortunately, I was again back to struggling with being concise in my solutions. I think one of the biggest things I struggle with is knowing when it is appropriate to argue or prove something in a short-hand way. For example, on both 1.4 and 1.5 you gave your solution in 1-2 sentences where each of my solutions were about 10x that long. I think I struggle with this because I am still not super comfortable with the material so I feel compelled to over explain to ensure I "cover all my bases," if that makes sense. I think (read hope) that as I get more familiar and confident with proofs I will be better able to identify the situations where I can make a strong, compelling argument with less explanation.   
+% \item What useful feedback did you incorporate from your groupmates?
+\item The feedback on all five of my questions was a variation of the same sentence, "Your answer was correct and easy to follow." There was not actually any feedback about ways I could improve for the final draft, so I had nothing to incorporate. I did find it interesting that on three of the questions (1.1, 1.3, 1.5) my groupmate said my solution was "concise and clear" which, as mentioned above, is the area I think I struggled the most. I found this surprising but I am my own harshest critic.   
+% \item What useful feedback did you provide to your groupmates?
+\item I mainly provided stylistic feedback but on one or two occasions the feedback dealt with a minor error in the solution. Some of the specifics include, using ".." instead of "..." in an array range e.g., $A[p..r]$, minor \LaTeX errors like forgetting a symbol, issues with line numbers, identifying confusing sections that could be altered to make the argument more clear to the reader, etc. The larger problem I identified incorrect subproblem sizes in question 1.1. That being said, I actually had less feedback to give this week (one page Google Doc) compared to past weeks. I think like myself, other students are starting to feel more comfortable with the material. 
+% \item What elements of writing are you going to focus on improving in
+%   future problem sets?
+\item I feel like I keep repeating myself but I have a very clear problem area that overshadows some of the other areas I could make improvements in. You probably guessed it, I plan to continue with my focus on making more concise arguments and not repeating myself. I will also focus on trying to do a better job identifying questions that can be successfully argued in just a few sentences rather than 20 sentences and 10 lines of functions/equations. I plan to work on this by spending more time thinking about what the question is asking and specifically what is required to provide a solution to that question. I think in many cases I read the problem then go straight into the analysis based on similar problems I did in the past. Like 1.4, in the past we wrote up the cost/execution table and did the analysis that way so rather than thinking about the most efficient way to solve the problem, I immediately began writing up the running time table.      
+\end{enumerate}
+
+%% VVVVVVVVVVV Don't change anything below this line VVVVVVVVVVVVVVV
+
+\end{document}

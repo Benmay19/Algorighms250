@@ -1,0 +1,236 @@
+\documentclass[11pt]{article} 
+
+% ------- List of packages to import ------------
+\usepackage{fullpage}
+\usepackage{soul}
+\usepackage{url}
+\usepackage{pgf}
+\usepackage{tikz}
+\usepackage{enumitem}
+\usetikzlibrary{arrows,automata}
+\usepackage[latin1]{inputenc}
+\usepackage{clrscode3e} % Documentation here http://www.cs.dartmouth.edu/~thc/clrscode/clrscode3e.pdf
+\usepackage{amssymb}
+\usepackage{amsmath}
+\RequirePackage[amsmath,hyperref,thmmarks]{ntheorem}
+\usepackage{hyperref} % This always has to be the LAST package.  
+
+\theoremseparator{.}
+
+% ------- Theorem and related environments --------
+\newtheorem{theorem}{Theorem}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition} 
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem{observation}[theorem]{Observation}
+\newtheorem{fact}[theorem]{Fact}
+
+% ------- Commands specifying theorem style -------
+
+\theoremstyle{nonumberplain}
+\theoremheaderfont{\normalfont\itshape}
+\theorembodyfont{\normalfont}
+\theoremsymbol{\ensuremath{_\blacksquare}}
+\newtheorem{proof}{Proof}
+
+% ------- Useful math macros -----------
+\newcommand{\NN}{\mathcal{N}} % Natural Numbers
+\newcommand{\RR}{\mathcal{R}} % Real Numbers
+\newcommand{\ZZ}{\mathcal{Z}} % Integers
+\newcommand{\QQ}{\mathcal{Q}} % Rational Numbers
+
+\newcommand{\set}[1]{\ensuremath{\{{#1}\}}} % Set
+\newcommand{\bigset}[1]{\ensuremath{\left\{{#1}\right\}}}
+\newcommand{\condset}[2]{\ensuremath{\set{{#1}\;|\;{#2}}}} % Conditional set
+\newcommand{\nin}{\not\in}
+\newcommand{\cross}{\times} % Cartesian product
+\newcommand{\ssn}{\subsetneq} % Proper subset
+\newcommand{\sse}{\subseteq} % Subset
+
+
+
+
+\begin{document}
+
+%% ^^^^^^^^^ Don't change anything above this line ^^^^^^^^^^^^^^^^
+
+
+
+\begin{center}
+
+{\LARGE
+\textsc{CSC 250 -- Algorithms -- Problem Set 7}
+\bigskip}
+
+\bigskip
+{\Large
+%\textsc{Solution}
+}
+
+
+\end{center}
+
+%\section*{Problem}
+ 
+% Your term abroad in Imaginaristeinastania is winding down and before
+% you fly home you decide to take a multiday road trip to across the
+% countryside with your friends.  Your trip begins in the capital city
+% $S$.  Although your friends are looking for a nice relaxed drive
+% across the countryside you are in a hurry.  Your goal is to reach the
+% coastal city $T$ as soon as possible, once there you'll board a flight
+% back to the USA to immediately start an awesome summer internship at
+% Microoglebook.
+
+% Since you're environmentally conscious you rent an electric car (with
+% an appropriately large trunk) in the capital city $S$, and begin to
+% plan your trip across Imaginaristeinastania.  You have a map which
+% depicts all the cities in Imaginaristeinastania with public electric
+% car charging stations, as well as the driving times (at the speed
+% limit) between these cities.
+
+% The battery of the car is limited and can only drive for $t$ minutes
+% before needing to recharge.  The recharging process is slow and
+% expensive.  It takes most of a night to fully charge the car.  Further,
+% the charging stations bill you the same amount for each time your
+% charge regardless of how much energy you draw into the car's battery.
+% Effectively this means you are limited to driving at most $t$ minutes
+% a day before stopping for the night and recharging.
+
+% Determined to find the best possible route you develop an algorithm to
+% select a route that takes you and your friends from $S$ to $T$ in the
+% fewest number of days.
+
+% Develop and analyze an efficient algorithm for the problem
+% above.  In particular your solution should include:
+\begin{enumerate}
+\item \textbf{Problem Description.} %A formal description defining and
+%   discussing the relationship between inputs and outputs.\\
+  Our computational problem is as follows:\\
+  \underline{Input:} an undirected graph $G=(V,E)$, a start vertex $S \in V$, a goal vertex $T \in V$, a weight function $w:E \rightarrow \mathbb{R}^+$, a non-negative integer $t$.\\
+  \underline{Output:} A linked list of vertices that make up the constrained shortest path from $S$ to $T$ such that the sum of edge weights surpass $t$ the minimum number of times.\\
+  \\
+  In this problem, the graph $G$ represents a map where each vertex represents a cities, and each edge is a road between cities with a weight corresponding to the travel time in minutes between cities. Our output contains the cities along the path allowing us to travel from city $S$ to city $T$ in the minimum number of days subject to the constraint $t$, the length of battery charge in minutes. In other words, the path requiring us to stop for the night to charge the car battery the minimum number of times.
+  
+\item \textbf{Algorithm Description.} %An informal, intuitive
+%   description of your algorithm in English.\\
+We begin with a description of the algorithm $\proc{Optimal-Trip}$. The algorithm is a modified version of Dijkstra's shortest weighted path algorithm defined as the minimum sum of all weights on the edges of a path between two vertices. Each time a shorter path is computed, the previously stored shortest path is replaced with the new shortest path resulting in the overall shortest path to each vertex at termination. Dijkstra's algorithm computes this shortest weighted path from a given starting vertex to all other reachable vertices in the weighted, undirected graph $G=(V,E)$. $\proc{Optimal-Trip}$ is a modified version of Dijkstra's such that the algorithm computes the path from a start vertex $S$ to a single goal vertex $T$ in the minimum number of ``days." Days are tracked in the attribute $v.stops$ for each vertex $v \in V$. Specifically, a ``day" is added when the sum of an edge weight to a given adjacent vertex $v \in Adj[u]$ causes the total path weight of the ``distance" (in minutes) attribute $v.dist$ to be greater than our maximum weight constraint $t$, $v.stops$ is set to $u.stops+1$ and our attribute $v.d$, tracking our distance is updated to just the current edge weight $w(u,v)$ from the vertex $u$ to the adjacent vertex $v$. As the procedure runs, each time a new path from $S$ to a given vertex $v \in V$, with a smaller attribute value $v.stops$ is found, we update $v.stops$ to store the new value and set the predecessor $v.\pi$ equal to $u$. Thus, at termination, our goal vertex $T$ contains the value of the minimum number of days for any path in the attribute $T.stops$ and the predecessor vertex along this shortest path in the attribute $T.\pi$. The final step in the algorithm traces the path back from $T$ to $S$ adding each vertex along the path to the front of a linked list which puts the vertices from $T$ to $S$ in reverse order so when the list is returned, it is the optimal path from $S$ to $T$ in the correct order.     
+\newpage
+\item \textbf{Algorithm.} %A formal statement of your algorithm written
+%   using the codebox environment.\\
+\begin{codebox}
+\Procname{$\proc{Optimal-Trip}(G,S,T,w,t)$}
+\li Create an empty priority queue $Q$ and linked list $Path$
+\li \For each vertex $u \in V$ \Do
+\li     $u.visited=FALSE$
+\li     $u.dist=\infty$
+\li     $u.\pi=NIL$
+\li     $u.stops=\infty$
+\li     $\proc{Enqueue}(Q,u,u.stops)$
+    \End
+\li $S.dist=0$
+\li $S.stops=0$
+\li $\proc{Update}(Q,S,0)$
+\li \While Q is not empty \Do
+\li     $u=\proc{Dequeue}(Q)$
+\li     \For each vertex $v \in G.Adj[u]$ \Do
+\li         \If not $v.visited$ \Do
+\li             \If $u.dist+w(u,v)>t$ and $u.stops+1<v.stops$ \Do
+\li                 $v.stops=u.stops+1$
+\li                 $v.dist=w(u,v)$
+\li                 $v.\pi=u$
+\li             \Else \If $u.stops<v.stops$
+\li                 $v.stops=u.stops$
+\li                 $v.dist=u.dist+w(u,v)$
+\li                 $v.\pi=u$
+                \End
+\li             $\proc{Update}(Q,v,v.stops)$
+            \End
+        \End
+\li     $u.visited=TRUE$
+    \End
+\li $city=T.\pi$
+\li \While $city \neq S$ \Do  
+\li     add $city$ to front of $Path$
+\li     $city=city.\pi$
+    \End
+\li \Return $Path$
+
+\end{codebox}
+\item \textbf{Correctness.} %A formal argument that your algorithm is
+%   correct.\\
+$\proc{Optimal-Trip}$ is a variation of Dijkstra's Algorithm such that it is modified to constrain the maximum value of any given shortest weighted path. %$t$ placed on the maximum weight allowed for any shortest weighted path between two vertices $u,v \in V$ and our algorithm returns the optimal path from a start vertex $S$ to a single goal vertex $T$ in which the optimal path have surpassed $t$ the minimum number of times.
+As a result, we prove the correctness of $\proc{Optimal-Trip}$ by assuming the correctness of Dijkstra's algorithm and arguing that our modifications are correct and do not \emph{break} the correctness of Dijkstra's algorithm.
+\begin{claim}
+Dijkstra's algorithm is correct for finding the shortest weighted path for a start vertex to every other vertex $u \in V$ in a weighted, undirected graph $G=(V,E)$.
+\end{claim}
+\begin{proof}
+By the fact that Dijkstra's Algorithm is a well known and has been proven correct on numerous occasions.
+\end{proof}
+\begin{claim}
+$\proc{Optimal-Trip}$ which is a modification of Dijkstra's algorithm with the addition of a positive integer constraint $t$, a goal vertex $T$, and an additional vertex attribute $u.stops$ for tracking each time the sum of edge weights in a given path exceeds our constraint $t$. At termination, each vertex $u \in V$ contains the constrained shortest path from $S$ to $u$ in the attribute $u.stops$ such that $u.stops=\delta(S,u)$. Moreover, the attribute $u.\pi$ contains the vertex which is the predecessor of $u$ in the constrained shortest path where $(u.\pi).stops=\delta(S,u.\pi)$. Thus, at termination, $T.stops=\delta(S,T)$ and by following the predecessor vertices from $T$ back to $S$ we can determine the vertices in the constrained shortest path from $S$ to $T$.
+\end{claim}
+\begin{proof}
+We argue that each of the primary modification made to Dijkstra's algorithm are correct, one modification at a time.
+\begin{enumerate}
+    \item In the initial for loop of lines 2-7, we initialize an additional vertex attribute $u.stops$ for each vertex $u \in V$ to track the number of times the sum of the edge weights surpasses our constraint $t$. Moreover, we modify our priority queue to determine priority based on the value of the attribute $u.stops$ rather than $u.dist$. Since $u.dist$ and $u.stops$ are both initialized to $\infty$, the correctness of Dijkstra's algorithm holds.
+    \item In the while loop of lines 11-24, the correctness of Dijkstra's algorithm can be argued using the loop invariant, ``at the start of each iteration of the while loop $v.dist=\delta(S,v)$ for each vertex $v \in V$ where $v.visited=TRUE$." We argue that our loop invariant, which changes ``$v.dist=\delta(S,v)$" to $v.stops=\delta(S,v)$, does not change the overall behavior of the loop since tracking the shortest path based on distance acts the same a tracking shortest path in days. Thus the three properties of the loop invariant are maintained.\\
+    \\
+    Since the initialization and termination properties are identical for the two loop invariants with regard to $\delta(S,v)$, we simply need to demonstrate that our modifications do what they are supposed to and the correctness of the maintenance property of Dijkstra's algorithm immediately follows. We accomplish this by showing that $\proc{Optimal-Trip}$ updates vertex attributes in the correct way.\\
+    \\
+    \textbf{Case 1.} \If $u.dist+w(u,v)>t$ and $u.stops+1<v.stops$.\\
+    This case controls for the weight constraint $t$. If current sum of edge weights $u.dist$ plus the edge weight to an adjacent vertex $w(u,v)$ is greater than $t$, we must increment the current value of our constraint tracker $u.stops$ by one. However, by the loop invariant we know $v.stops=\delta(S,v)$ so before we update $v$, we check our second condition that $u.stops+1<v.stops$. This test ensures that $v$ is updated if and only if the edge $(u,v)$ is part of the shortest path $\delta(S,v)$. If both conditions are satisfied, we update the attributes $v.stops=u.stops+1=\delta(S,v)$, reset $v.dist=w(u,v)$ since we passed out constraint $t$, and set $v.\pi=u$ since $u$ is the predecessor vertex in the shortest path $\delta(S,v)$.\\
+    \\
+    \textbf{Case 2.} \If $u.dist+w(u,v) \le t$ and $u.stops<v.stops$.\\
+    In this case the current sum of edge weights plus the adjacent edge weight $w(u,v)$ does not exceed the weight constraint $t$. We ensure $v$ is only updated if the edge $(u,v)$ is part of the shortest path $\delta(S,v)$. If this condition is satisfied we update $v$ such that $v.stops=u.stops=\delta(S,v)$, $v.dist=u.dist+w(u,v)$ to update our edge weight sum, and set $v.\pi=u$.\\
+    \\
+    \textbf{Case 3.} If neither case 1 nor case 2 are satisfied, we do not update the vertex $v$ because $v.stops=\delta(S,v)$.\\
+    \\
+    Observe that cases 2 and 3 are the same as Dijkstra's algorithm for $\delta(S,v)$ and case 1 is similar to case 2 but controls for our constraint $t$. As a result, our modifications to the while loop do not change the behavior of Dijkstra's algorithm. Thus, the correctness of Dijkstra's algorithm applies to $\proc{Optimal-Trip}$ as well.
+    \item Having shown that at termination the attribute $u.\pi$ of each vertex $u \in V$ stores the predecessor vertex on the optimal shortest path $\delta(S,v)$, it is clear that iterating through the predecessor vertices from $T$ to $S$ we have the optimal shortest path in reverse order but by storing each predecessor vertex from $T$ to in the front of a linked list, when the list is output, we have the shortest path $\delta(S,T)$ in order from $S$ to $T$, not including $S$. 
+\end{enumerate}
+\end{proof}
+\item \textbf{Running Time.} %A statement of the running time of your
+%   algorithm and a formal argument that your algorithm runs in the
+%   stated time.\\
+\begin{claim}
+The total running time of $\proc{Optimal-Trip}$ is $O(n \log n+m)$ using an adjacency list and a Fibonacci heap for the min-priority queue.
+\end{claim}
+We see that in the initial for loop of lines 2-7, we initialize and $\proc{enqueue}$, each of the $|V|$ vertices which takes $O(\log n)$ for each execution. The remaining algorithm is dominated by the while loop of lines 11-24 and the for loop of lines 13-23. Since the while loop processes each vertex $u \in V$ exactly once the $\proc{Dequeue}$ operation executes $|V|$ times and executes is $O(\log n)$ time. The for loop of lines 13-23 iterates over each edge in the adjacency list once for a total of $|E|$ iterations and calls $\proc{Update}$ on each edge which executes in $O(1)$ time. The remaining running time of the final while loop executes at most $O(n)$ times, in the case that there is a only a single path from $S$ to $T$, and all other lines runs in $O(1)$ time. Thus, we have a total running time of $O(n \log n+m)$.
+\end{enumerate}
+
+% If you are looking for an example of what is expected you may want to
+% examine at the model solutions for past problem sets or exams.
+
+\section*{Self Reflection}
+
+% Respond to the following prompts in the final draft of your solution:.
+
+\begin{enumerate}
+% \item Is your solution correct?  Explain briefly.\\
+\item I believe my solution is largely correct. I think my computational problem is correct for my specific algorithm which outputs the actual vertices included in the shortest path. I think my algorithm description is correct in that it sufficiently describes my algorithm. My Algorithm is quite a bit different than yours but I believe it still works. I was bale to identify that the problem requires a modified version of Dijkstra's algorithm and believe my modifications produce the desired outcome. My correctness proof was also quite a bit different than yours which makes sense because I actually modified Dijkstra's algorithm rather than simply using it as a subroutine like in your solution. I am not sure but I believe my correctness argument holds. I thought that by arguing my modifications do not change the overall behavior of Dijkstra, I could just claim that it is correct because Dijkstra is correct, I could be wrong about this. My running time is different than both of the possible running times you mentioned in your solution but I believe it is correct because it mirrors the running time for Dijkstra from lecture and the textbook and I don't think my modifications change this running time.
+% \item What did you do well and poorly?  Explain briefly.\\
+\item I think I did a good job identifying that this problem requires a modification of Dijkstra's algorithm and did a pretty good job making those modifications in a way that made sense to me. I do not know for sure but I think I did a poor job proving correctness in the most effective or sound way. Even if my proof is sufficient, I know it is definitely not the best argument that can be made.
+% \item What material did you struggle with?  Explain briefly.\\
+\item My biggest struggle was determining how to make a correctness proof without completely reproving Dijkstra's algorithm in the process. My goal was to show that changing the shortest path indicator $\delta(S,u)$ from $u.dist$ to $u.stops$ does not actually change the behavior (and resulting correctness) of the algorithm and account for the constraint. I struggled to do this in a formal way.
+% \item What useful feedback did you incorporate from your groupmates?\\
+\item I received little feedback on this problem set. As a result, I had very little to incorporate. I did slightly improve the clarity of my intuitive description in question 1. In addition, all of my quotation marks were end quotes which my groupmate pointed out. I believe I got most of them changed.
+% \item What useful feedback did you provide to your groupmates?\\
+\item I provided quite a bit of feedback by question number. 1. The intuitive description of what the inputs and outputs represent (cities, battery life, etc.) was included in the computational problem. I didn't think this was necessary in a formal computational problem so I mentioned possibly putting that information in a few sentences outside of the computational problem. 2. Recommended adding a bit more detail to the algorithm description. It essentially said, "it is Dijkstra's algorithm modified to track days instead of total distance." 3. One of the vertex attributes was named differently in different part of the algorithm. It was likely a careless error so I pointed it out. 4 and 5. I recommended adding more detail. For both it essentially just claimed that Dijkstra's algorithm is correct so his algorithm is correct and that the running time is the same as Dijkstra's. I believe this is in fact the case but there was no additional detail. Specifically, in the running time he claimed a running time based on a Fibonacci heap implementation of the priority queue but he did not mention he used a Fibonacci heap anywhere in the paper.   
+% \item Go back and look through your solutions to Problem Sets 1-7. Reflect at length on your
+%   progress throughout the term. That this part of the reflection is worth 10\% this problem
+%   set grade.
+\item
+  \begin{itemize}
+%   \item What aspects of writing have you improved at?
+  \item I think it is clear from all problem sets that the biggest area needing improvement was mt inability to communicate in a concise and technical manner. I think this has improved at times and in certain areas. This is particularly true for the intuitive description of algorithms. In the past I would essentially explain the algorithm line by which I learned is completely unnecessary (the size and initialization of an array is not relevant in an informal overview). I have also improved my ability to systematically argue correctness and running time, particularly in situations that are more "clear cut" (arguing correctness via loop invariant or induction). I still struggle with situations like in this problem set where I am trying to argue modifications to an existing algorithm. Another aspect that has really improved in my writing is my understanding of how to format a technical paper. This includes using sections, claims, proofs, etc. This is something I had no experience with prior to taking this class and I am grateful for the opportunity because technical writing seems to be an invaluable skill in the field of computer science.  
+%   \item What aspects of writing do you still need to work on?\\
+  \item I still definitely need to continue working on my ability to communicate in a clear and concise manner. I think this is something I will be working on for the rest of my life. I also need to continue working on my understanding of mathematical proofs. This is not entirely related to writing, but I have found that in writing proofs where I am less confident in the argument I am making, I tend to be less concise and include too much, unnecessary information. As a result, I believe if I improve my understanding of proof theory, I will be able to more effectively and efficiently communicate my argument. I also need to continue working on adding more specific technical language in my writing. I believe this will also help make my writing more concise. For example, explaining in words where to slice a sting could take me a couple sentences, or I could simply write $L[k+1..n]$. If I was better at identifying these situations in my writing, I think it would definitely improve my technical writing and make it easier to understand. 
+  \end{itemize}
+\end{enumerate}
+
+
+\end{document}
